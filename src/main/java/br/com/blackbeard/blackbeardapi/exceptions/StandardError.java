@@ -2,10 +2,8 @@ package br.com.blackbeard.blackbeardapi.exceptions;
 
 import lombok.Data;
 
-import java.io.Serializable;
-
 @Data
-public class StandardException<T> implements Serializable {
+public class StandardError<T> {
 
     private Integer status;
     private T message;
@@ -13,7 +11,7 @@ public class StandardException<T> implements Serializable {
     private long timeStamp;
     private String path;
 
-    public StandardException(Integer status, T message, String error, long timeStamp, String path) {
+    public StandardError(Integer status, T message, String error, long timeStamp, String path) {
         this.status = status;
         this.message = message;
         this.error = error;

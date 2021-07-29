@@ -10,6 +10,9 @@ import org.springframework.stereotype.Component;
 public class BarberShopMapper {
     private static final ModelMapper mapper = new ModelMapper();
 
+    private BarberShopMapper() {
+    }
+
     public static BarberShop convertToModel(BarberShopRequest request) {
         return mapper.map(request, BarberShop.class);
     }

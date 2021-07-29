@@ -16,10 +16,10 @@ import java.util.stream.Collectors;
 public class ResourceExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<StandardException<List<String>>> validation(
+    public ResponseEntity<StandardError<List<String>>> validation(
             MethodArgumentNotValidException e, HttpServletRequest request) {
-        StandardException<List<String>> error =
-                new StandardException<>(
+        StandardError<List<String>> error =
+                new StandardError<>(
                         HttpStatus.BAD_REQUEST.value(),
                         e.getBindingResult().getAllErrors().stream()
                                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
