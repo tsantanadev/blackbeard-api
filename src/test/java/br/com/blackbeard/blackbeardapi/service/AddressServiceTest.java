@@ -29,7 +29,7 @@ class AddressServiceTest {
     ArgumentCaptor<Address> addressCaptor;
 
     @Test
-    public void shouldUpdateAddress() {
+    void shouldUpdateAddress() {
         var persistedAddress = Address.builder()
                 .id(UUID.randomUUID())
                 .city("New york")
@@ -45,7 +45,7 @@ class AddressServiceTest {
                 .number("39")
                 .build();
 
-        var expected =  Address.builder()
+        var expected = Address.builder()
                 .id(persistedAddress.getId())
                 .city(address.getCity())
                 .district(address.getDistrict())

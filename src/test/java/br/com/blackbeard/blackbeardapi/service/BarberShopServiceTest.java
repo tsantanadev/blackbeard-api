@@ -42,7 +42,7 @@ class BarberShopServiceTest {
     private BarberShop barberShop;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         var address = Address.builder()
                 .id(UUID.randomUUID())
                 .build();
