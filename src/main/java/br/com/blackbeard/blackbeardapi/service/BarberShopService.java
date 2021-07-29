@@ -1,7 +1,6 @@
 package br.com.blackbeard.blackbeardapi.service;
 
 import br.com.blackbeard.blackbeardapi.exceptions.ObjectNotFoundException;
-import br.com.blackbeard.blackbeardapi.models.Address;
 import br.com.blackbeard.blackbeardapi.models.BarberShop;
 import br.com.blackbeard.blackbeardapi.repositories.BarberShopRepository;
 import org.springframework.beans.factory.annotation.Autowired;
