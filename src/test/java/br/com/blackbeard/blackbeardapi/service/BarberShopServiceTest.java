@@ -1,4 +1,4 @@
-package br.com.blackbeard.blackbeardapi.serviceTest;
+package br.com.blackbeard.blackbeardapi.service;
 
 import br.com.blackbeard.blackbeardapi.exceptions.ObjectNotFoundException;
 import br.com.blackbeard.blackbeardapi.models.Address;
@@ -107,16 +107,32 @@ class BarberShopServiceTest {
 
     @Test
     void shouldUpdateAnBarberShopById() {
+        var persisteBarberShop = BarberShop.builder()
+                .id(UUID.randomUUID())
+                .name("teste")
+                .imageUrl("http://www.teste.com")
+                .address(Address.builder().build())
+                .build();
 
-        when(repository.findById(barberShop.getId())).thenReturn(Optional.of(barberShop));
-        doNothing().when(addressService).update(barberShop.getAddress(), barberShop.getAddress());
+        var barberShop = BarberShop.builder()
+                .id(UUID.randomUUID())
+                .name("teste 2")
+                .imageUrl("http://www.teste2.com")
+                .address(Address.builder().build())
+                .build();
 
-        service.update(barberShop, barberShop.getId());
-        verify(repository).save(barberShopCaptor.capture());
+        var expected = BarberShop.builder()
+                .id(persisteBarberShop.getId())
+                .name(barberShop.getName())
+                .imageUrl(barberShop.getImageUrl())
+                .address(persisteBarberShop.getAddress())
+                .build();
 
-        var result = barberShopCaptor.getValue();
+        when(repository.findById(persisteBarberShop.getId())).thenReturn(Optional.of(persisteBarberShop));
 
-        assertThat(result.getId()).isEqualTo(barberShop.getId());
-        verify(addressService, times(1)).update(barberShop.getAddress(), barberShop.getAddress());
+        service.update(barberShop, persisteBarberShop.getId());
+
+        verify(repository, times(1)).save(expected);
+
     }
 }
