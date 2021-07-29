@@ -4,8 +4,6 @@ import br.com.blackbeard.blackbeardapi.exceptions.ObjectNotFoundException;
 import br.com.blackbeard.blackbeardapi.models.Address;
 import br.com.blackbeard.blackbeardapi.models.BarberShop;
 import br.com.blackbeard.blackbeardapi.repositories.BarberShopRepository;
-import br.com.blackbeard.blackbeardapi.service.AddressService;
-import br.com.blackbeard.blackbeardapi.service.BarberShopService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -107,7 +105,7 @@ class BarberShopServiceTest {
 
     @Test
     void shouldUpdateAnBarberShopById() {
-        var persisteBarberShop = BarberShop.builder()
+        var persistedBarberShop = BarberShop.builder()
                 .id(UUID.randomUUID())
                 .name("teste")
                 .imageUrl("http://www.teste.com")
@@ -122,15 +120,15 @@ class BarberShopServiceTest {
                 .build();
 
         var expected = BarberShop.builder()
-                .id(persisteBarberShop.getId())
+                .id(persistedBarberShop.getId())
                 .name(barberShop.getName())
                 .imageUrl(barberShop.getImageUrl())
-                .address(persisteBarberShop.getAddress())
+                .address(persistedBarberShop.getAddress())
                 .build();
 
-        when(repository.findById(persisteBarberShop.getId())).thenReturn(Optional.of(persisteBarberShop));
+        when(repository.findById(persistedBarberShop.getId())).thenReturn(Optional.of(persistedBarberShop));
 
-        service.update(barberShop, persisteBarberShop.getId());
+        service.update(barberShop, persistedBarberShop.getId());
 
         verify(repository, times(1)).save(expected);
 
