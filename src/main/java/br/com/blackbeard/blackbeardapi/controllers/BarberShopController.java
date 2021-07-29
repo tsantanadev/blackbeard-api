@@ -27,7 +27,7 @@ public class BarberShopController {
     }
 
     @PutMapping
-    public ResponseEntity<Void> update(@RequestBody @Valid BarberShopRequest request, @RequestParam UUID barberShopId) {
+    public ResponseEntity<Void> update(@RequestBody @Valid BarberShopRequest request, @RequestParam("barberShopId") UUID barberShopId) {
         service.update(BarberShopMapper.convertToModel(request), barberShopId);
         return ResponseEntity.accepted().build();
     }

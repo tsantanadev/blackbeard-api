@@ -25,6 +25,7 @@ public class BarberShopService {
 
     public BarberShop create(BarberShop barberShop) {
         barberShop.generateId();
+        addressService.save(barberShop.getAddress());
         return repository.save(barberShop);
     }
 
