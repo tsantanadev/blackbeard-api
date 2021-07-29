@@ -23,4 +23,8 @@ public class Address {
         this.street = address.getStreet();
         this.number = address.getNumber();
     }
+
+    public void generateId() {
+        this.id = UUID.randomUUID();
+    }
 }

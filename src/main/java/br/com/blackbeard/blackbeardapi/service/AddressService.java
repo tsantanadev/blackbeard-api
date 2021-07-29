@@ -15,4 +15,9 @@ public class AddressService {
         persistedAddress.update(address);
         repository.save(persistedAddress);
     }
+
+    public void save(Address address) {
+        address.generateId();
+        repository.save(address);
+    }
 }
