@@ -22,7 +22,7 @@ public class BarberShopController {
 
     @PostMapping
     public ResponseEntity<BarberShopResponse> insert(@RequestBody @Valid BarberShopRequest request) {
-        var barberShop = service.create(BarberShopMapper.convertToModel(request));
+        var barberShop = service.save(BarberShopMapper.convertToModel(request));
         return ResponseEntity.ok(BarberShopMapper.convertToResponse(barberShop));
     }
 

@@ -1,10 +1,7 @@
 package br.com.blackbeard.blackbeardapi.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -15,6 +12,7 @@ import java.util.UUID;
 
 @Data
 @Entity
+@EqualsAndHashCode
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -46,3 +44,4 @@ public class BarberShop {
     }
 
 }
+

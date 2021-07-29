@@ -23,9 +23,11 @@ public class BarberShopService {
         this.addressService = addressService;
     }
 
-    public BarberShop create(BarberShop barberShop) {
+    @Transactional
+    public BarberShop save(BarberShop barberShop) {
         barberShop.generateId();
-        addressService.save(barberShop.getAddress());
+        var persistedAddress = addressService.save(barberShop.getAddress());
+        barberShop.setAddress(persistedAddress);
         return repository.save(barberShop);
     }
 
