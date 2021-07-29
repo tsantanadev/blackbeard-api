@@ -9,6 +9,8 @@ import br.com.blackbeard.blackbeardapi.service.BarberShopService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -35,6 +37,9 @@ class BarberShopServiceTest {
 
     @Mock
     private AddressService addressService;
+
+    @Captor
+    ArgumentCaptor<BarberShop> barberShopCaptor;
 
     private BarberShop barberShop;
 
@@ -73,13 +78,22 @@ class BarberShopServiceTest {
 
     @Test
     void shouldCreateAnBarberShop() {
-        doNothing().when(addressService).save(barberShop.getAddress());
-        when(repository.save(barberShop)).thenReturn(barberShop);
+        var newAddress = Address.builder().id(null).build();
+        var newBarberShop = BarberShop.builder()
+                .id(null)
+                .address(newAddress)
+                .build();
 
-        var result = service.create(barberShop);
+        when(addressService.save(newAddress))
+                .thenReturn(Address.builder().id(UUID.randomUUID()).build());
 
-        assertThat(result).isEqualTo(barberShop);
-        verify(addressService, times(1)).save(barberShop.getAddress());
+        service.save(newBarberShop);
+
+        verify(repository).save(barberShopCaptor.capture());
+        var result = barberShopCaptor.getValue();
+
+        assertThat(result.getId()).isNotNull();
+        assertThat(result.getAddress().getId()).isNotNull();
     }
 
     @Test

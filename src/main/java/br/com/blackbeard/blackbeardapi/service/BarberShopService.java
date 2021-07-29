@@ -1,6 +1,7 @@
 package br.com.blackbeard.blackbeardapi.service;
 
 import br.com.blackbeard.blackbeardapi.exceptions.ObjectNotFoundException;
+import br.com.blackbeard.blackbeardapi.models.Address;
 import br.com.blackbeard.blackbeardapi.models.BarberShop;
 import br.com.blackbeard.blackbeardapi.repositories.BarberShopRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,9 +24,11 @@ public class BarberShopService {
         this.addressService = addressService;
     }
 
-    public BarberShop create(BarberShop barberShop) {
+    @Transactional
+    public BarberShop save(BarberShop barberShop) {
         barberShop.generateId();
-        addressService.save(barberShop.getAddress());
+        var persistedAddress = addressService.save(barberShop.getAddress());
+        barberShop.setAddress(persistedAddress);
         return repository.save(barberShop);
     }
 

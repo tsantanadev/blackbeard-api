@@ -16,8 +16,8 @@ public class AddressService {
         repository.save(persistedAddress);
     }
 
-    public void save(Address address) {
+    public Address save(Address address) {
         address.generateId();
-        repository.save(address);
+        return repository.save(address);
     }
 }
