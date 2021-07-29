@@ -14,11 +14,13 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -98,23 +100,13 @@ class BarberShopServiceTest {
 
     @Test
     void shouldFindAllBarberShop() {
-        final Pageable pageable = PageRequest.of(20, 20);
+        final var pageable = PageRequest.of(20, 20);
 
-        var barberShop1 = BarberShop.builder().build();
-        var barberShop2 = BarberShop.builder().build();
+        when(repository.findAll(pageable)).thenReturn(Page.empty());
 
-        var listBarberShop = new ArrayList<BarberShop>();
-        listBarberShop.add(barberShop);
-        listBarberShop.add(barberShop1);
-        listBarberShop.add(barberShop2);
+        service.listAll(pageable);
 
-        var listPageBarberShop = new PageImpl<>(listBarberShop);
-
-        when(repository.findAll(pageable)).thenReturn(listPageBarberShop);
-
-        var result = service.listAll(pageable);
-
-        assertThat(result.getSize()).isEqualTo(3);
+        verify(repository, times(1)).findAll(pageable);
     }
 
     @Test
