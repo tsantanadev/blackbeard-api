@@ -114,6 +114,7 @@
 						<exclude>**/dtos/**/*</exclude>
 						<exclude>**/mappers/**</exclude>
 						<exclude>**/exceptions/*Exception.java</exclude>
+						<exclude>**/exceptions/StandardError.java</exclude>
 					</excludes>
 				</configuration>
 				<executions>
