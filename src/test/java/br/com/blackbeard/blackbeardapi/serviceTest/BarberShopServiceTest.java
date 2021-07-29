@@ -10,19 +10,17 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class BarberShopServiceTest {
+class BarberShopServiceTest {
 
     @InjectMocks
     private BarberShopService service;
@@ -30,36 +28,36 @@ public class BarberShopServiceTest {
     @Mock
     private BarberShopRepository repository;
 
-    private Address address;
     private BarberShop barberShop;
 
     @BeforeEach
-    public void inicializar() {
-        this.address = Address.builder().id(UUID.randomUUID()).build();
-        this.barberShop = BarberShop.builder().id(UUID.randomUUID()).address(address).build();
+    public void setup() {
+        var address = Address.builder()
+                .id(UUID.randomUUID())
+                .build();
+
+        this.barberShop = BarberShop.builder()
+                .id(UUID.randomUUID())
+                .address(address).build();
     }
 
     @Test
-    void shouldFindAnBarberShopById() {
-        Mockito.when(repository.findById(barberShop.getId())).thenReturn(Optional.of(barberShop));
+    void shouldFindABarberShopById() {
+        when(repository.findById(barberShop.getId())).thenReturn(Optional.of(barberShop));
+
         var result = service.findById(barberShop.getId());
 
-        assertThat(result.getId(), is(barberShop.getId()));
-        assertEquals(result, barberShop);
+        assertThat(result).isEqualTo(barberShop);
+        verify(repository, times(1)).findById(barberShop.getId());
     }
 
     @Test
-    void shouldThrowExceptionWhenFindAnBarberShopById() {
-        Mockito.when(repository.findById(barberShop.getId())).thenReturn(Optional.of(barberShop));
-        service.findById(barberShop.getId());
-        try {
-            service.findById(UUID.randomUUID());
-        } catch (ObjectNotFoundException e) {
-            assertEquals("Object not found", e.getMessage());
-        }
-        assertThrows(ObjectNotFoundException.class, () -> service.findById(UUID.randomUUID()));
+    void shouldThrowExceptionWhenFindABarberShopById() {
+        when(repository.findById(barberShop.getId())).thenReturn(Optional.empty());
+
+        var exception = assertThrows(ObjectNotFoundException.class,
+        () -> service.findById(barberShop.getId()));
+
+        assertThat(exception).hasMessage("Object not found");
     }
-
-
-
 }
