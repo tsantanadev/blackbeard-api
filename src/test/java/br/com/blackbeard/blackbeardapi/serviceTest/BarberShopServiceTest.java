@@ -107,17 +107,16 @@ class BarberShopServiceTest {
 
     @Test
     void shouldUpdateAnBarberShopById() {
-        var barberShopID = barberShop.getId();
-        var newBarberShop = BarberShop.builder().build();
 
-        doNothing().when(addressService).update(barberShop.getAddress(), newBarberShop.getAddress());
-        when(repository.findById(barberShopID)).thenReturn(Optional.of(barberShop));
-        when(repository.save(barberShop)).thenReturn(newBarberShop);
+        when(repository.findById(barberShop.getId())).thenReturn(Optional.of(barberShop));
+        doNothing().when(addressService).update(barberShop.getAddress(), barberShop.getAddress());
 
-        service.update(newBarberShop, barberShopID);
+        service.update(barberShop, barberShop.getId());
+        verify(repository).save(barberShopCaptor.capture());
 
-        verify(repository, times(1)).save(barberShop);
-        verify(addressService, times(1)).update(barberShop.getAddress(), newBarberShop.getAddress());
-        assertThat(repository.save(barberShop)).isEqualTo(newBarberShop);
+        var result = barberShopCaptor.getValue();
+
+        assertThat(result.getId()).isEqualTo(barberShop.getId());
+        verify(addressService, times(1)).update(barberShop.getAddress(), barberShop.getAddress());
     }
 }
