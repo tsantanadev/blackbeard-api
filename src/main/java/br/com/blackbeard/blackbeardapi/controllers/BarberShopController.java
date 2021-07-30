@@ -1,7 +1,7 @@
 package br.com.blackbeard.blackbeardapi.controllers;
 
-import br.com.blackbeard.blackbeardapi.dtos.barberShop.BarberShopRequest;
-import br.com.blackbeard.blackbeardapi.dtos.barberShop.BarberShopResponse;
+import br.com.blackbeard.blackbeardapi.dtos.barbershop.BarberShopRequest;
+import br.com.blackbeard.blackbeardapi.dtos.barbershop.BarberShopResponse;
 import br.com.blackbeard.blackbeardapi.mappers.BarberShopMapper;
 import br.com.blackbeard.blackbeardapi.service.BarberShopService;
 import org.springframework.beans.factory.annotation.Autowired;
