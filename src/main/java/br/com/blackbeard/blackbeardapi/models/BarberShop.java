@@ -1,5 +1,6 @@
 package br.com.blackbeard.blackbeardapi.models;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -27,6 +28,7 @@ public class BarberShop {
     @ManyToOne
     private Address address;
 
+    @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
     @CreatedDate
     private LocalDateTime createDateTime;
 
@@ -42,6 +44,5 @@ public class BarberShop {
     public void generateId() {
         this.id = UUID.randomUUID();
     }
-
 }
 

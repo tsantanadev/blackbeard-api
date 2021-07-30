@@ -1,5 +1,6 @@
-package br.com.blackbeard.blackbeardapi.dtos;
+package br.com.blackbeard.blackbeardapi.dtos.barberShopDto;
 
+import br.com.blackbeard.blackbeardapi.dtos.addressDto.AddressRequest;
 import lombok.Data;
 import org.hibernate.validator.constraints.URL;
 

@@ -1,7 +1,7 @@
 package br.com.blackbeard.blackbeardapi.controllers;
 
-import br.com.blackbeard.blackbeardapi.dtos.BarberShopRequest;
-import br.com.blackbeard.blackbeardapi.dtos.BarberShopResponse;
+import br.com.blackbeard.blackbeardapi.dtos.barberShopDto.BarberShopRequest;
+import br.com.blackbeard.blackbeardapi.dtos.barberShopDto.BarberShopResponse;
 import br.com.blackbeard.blackbeardapi.mappers.BarberShopMapper;
 import br.com.blackbeard.blackbeardapi.service.BarberShopService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +27,8 @@ public class BarberShopController {
     }
 
     @PutMapping
-    public ResponseEntity<Void> update(@RequestBody @Valid BarberShopRequest request, @RequestParam("barberShopId") UUID barberShopId) {
+    public ResponseEntity<Void> update(@RequestBody @Valid BarberShopRequest request,
+                                       @RequestParam("barberShopId") UUID barberShopId) {
         service.update(BarberShopMapper.convertToModel(request), barberShopId);
         return ResponseEntity.accepted().build();
     }
