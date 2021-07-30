@@ -1,4 +1,4 @@
-package br.com.blackbeard.blackbeardapi.dtos.barberDto;
+package br.com.blackbeard.blackbeardapi.dtos.barber;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;

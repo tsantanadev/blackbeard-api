@@ -1,8 +1,8 @@
 package br.com.blackbeard.blackbeardapi.mappers;
 
-import br.com.blackbeard.blackbeardapi.dtos.barberDto.BarberRequest;
-import br.com.blackbeard.blackbeardapi.dtos.barberDto.BarberRequestUpdate;
-import br.com.blackbeard.blackbeardapi.dtos.barberDto.BarberResponse;
+import br.com.blackbeard.blackbeardapi.dtos.barber.BarberRequest;
+import br.com.blackbeard.blackbeardapi.dtos.barber.BarberRequestUpdate;
+import br.com.blackbeard.blackbeardapi.dtos.barber.BarberResponse;
 import br.com.blackbeard.blackbeardapi.models.Barber;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
@@ -11,6 +11,9 @@ import org.springframework.stereotype.Component;
 public class BarberMapper {
 
     private static final ModelMapper mapper = new ModelMapper();
+
+    private BarberMapper() {
+    }
 
     public static Barber convertToModel(BarberRequest request) {
         return mapper.map(request, Barber.class);

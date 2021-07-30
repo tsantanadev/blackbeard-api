@@ -1,4 +1,4 @@
-package br.com.blackbeard.blackbeardapi.dtos.addressDto;
+package br.com.blackbeard.blackbeardapi.dtos.address;
 
 import lombok.Data;
 
