@@ -30,7 +30,7 @@ public class BarberShop {
 
     @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
     @CreatedDate
-    private LocalDateTime createDateTime;
+    private LocalDateTime createDate;
 
     @JsonIgnore
     @OneToMany(mappedBy = "barberShop")
