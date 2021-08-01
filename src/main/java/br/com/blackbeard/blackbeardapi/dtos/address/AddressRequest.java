@@ -22,6 +22,6 @@ public class AddressRequest {
     @NotBlank
     private String street;
 
-    @NotBlank(message = "Test")
+    @NotBlank
     private String number;
 }

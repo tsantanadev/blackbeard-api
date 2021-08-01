@@ -1,8 +1,8 @@
 package br.com.blackbeard.blackbeardapi.controllers;
 
-import br.com.blackbeard.blackbeardapi.dtos.AddressRequest;
-import br.com.blackbeard.blackbeardapi.dtos.BarberShopRequest;
-import br.com.blackbeard.blackbeardapi.dtos.BarberShopResponse;
+import br.com.blackbeard.blackbeardapi.dtos.address.AddressRequest;
+import br.com.blackbeard.blackbeardapi.dtos.barbershop.BarberShopRequest;
+import br.com.blackbeard.blackbeardapi.dtos.barbershop.BarberShopResponse;
 import br.com.blackbeard.blackbeardapi.exceptions.ObjectNotFoundException;
 import br.com.blackbeard.blackbeardapi.models.Address;
 import br.com.blackbeard.blackbeardapi.models.BarberShop;
