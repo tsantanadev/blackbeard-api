@@ -41,10 +41,10 @@ class BarberShopTest {
 
     @Test
     void shouldGenerateId() {
-        var address = Address.builder().build();
+        var barberShop = BarberShop.builder().build();
 
-        address.generateId();
+        barberShop.generateId();
 
-        assertThat(address.getId()).isNotNull();
+        assertThat(barberShop.getId()).isNotNull();
     }
 }

@@ -1,7 +1,7 @@
 package br.com.blackbeard.blackbeardapi.mappers;
 
-import br.com.blackbeard.blackbeardapi.dtos.BarberShopRequest;
-import br.com.blackbeard.blackbeardapi.dtos.BarberShopResponse;
+import br.com.blackbeard.blackbeardapi.dtos.barbershop.BarberShopRequest;
+import br.com.blackbeard.blackbeardapi.dtos.barbershop.BarberShopResponse;
 import br.com.blackbeard.blackbeardapi.models.BarberShop;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
