@@ -8,22 +8,20 @@ import br.com.blackbeard.blackbeardapi.models.Address;
 import br.com.blackbeard.blackbeardapi.models.BarberShop;
 import br.com.blackbeard.blackbeardapi.service.BarberShopService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.UUID;
 
-import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
-import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -79,7 +77,7 @@ class BarberShopControllerTest {
                 .imageUrl(barberShopReturned.getImageUrl())
                 .build();
 
-        Mockito.when(service.save(barberShop)).thenReturn(barberShopReturned);
+        when(service.save(barberShop)).thenReturn(barberShopReturned);
 
         var json = mapper.writeValueAsString(barberShopRequest);
 
@@ -91,30 +89,32 @@ class BarberShopControllerTest {
     }
 
     @Test
-    void shouldReturnOkWhenGetByValidId() {
+    void shouldReturnOkWhenGetByValidId() throws Exception {
         var barberShopId = UUID.randomUUID();
         var barberShop = BarberShop.builder().id(barberShopId).build();
 
-        Mockito.when(service.findById(barberShopId)).thenReturn(barberShop);
+        var expectedResponse = BarberShopResponse.builder().id(barberShopId).build();
 
-        given()
-                .accept(ContentType.JSON)
-                .when()
-                    .get("/barberShop/{id}", barberShopId)
-                .then()
-                    .statusCode(HttpStatus.OK.value())
-                    .body("id", is(barberShopId.toString()));
+        when(service.findById(barberShopId)).thenReturn(barberShop);
+
+        var json = mapper.writeValueAsString(expectedResponse);
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/barberShop/{id}", barberShopId)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(content().string(json))
+                .andExpect(status().isOk());
     }
 
     @Test
-    void shouldReturnNotFoundWhenGetByInvalidId() {
-        Mockito.when(service.findById(any())).thenThrow(ObjectNotFoundException.class);
+    void shouldReturnNotFoundWhenGetByInvalidId() throws Exception {
+        when(service.findById(any())).thenThrow(ObjectNotFoundException.class);
 
-        given()
-                .accept(ContentType.JSON)
-                .when()
-                    .get("/barberShop/{id}", UUID.randomUUID())
-                .then()
-                    .statusCode(HttpStatus.NOT_FOUND.value());
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/barberShop/{id}", UUID.randomUUID())
+                        .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isNotFound());
     }
 }
