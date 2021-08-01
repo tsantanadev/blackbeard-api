@@ -1,10 +1,16 @@
 package br.com.blackbeard.blackbeardapi.dtos.address;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class AddressRequest {
 
     @NotBlank
@@ -16,6 +22,6 @@ public class AddressRequest {
     @NotBlank
     private String street;
 
-    @NotBlank
+    @NotBlank(message = "Test")
     private String number;
 }
