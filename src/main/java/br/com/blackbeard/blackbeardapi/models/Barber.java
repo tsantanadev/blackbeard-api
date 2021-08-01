@@ -24,7 +24,7 @@ public class Barber {
     private String name;
 
     @CreatedDate
-    private LocalDateTime createDateTime;
+    private LocalDateTime createdDate;
 
     @ManyToOne
     private BarberShop barberShop;
