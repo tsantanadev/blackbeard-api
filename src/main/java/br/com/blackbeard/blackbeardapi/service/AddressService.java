@@ -6,7 +6,6 @@ import br.com.blackbeard.blackbeardapi.repositories.AddressRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
 import java.util.UUID;
 
 @Service
@@ -28,7 +27,6 @@ public class AddressService {
         return repository.findById(addressId).orElseThrow(ObjectNotFoundException::new);
     }
 
-    @Transactional
     public Address save(Address address, UUID barberShopId) {
         address.generateId();
         final var persistedAddress = repository.save(address);

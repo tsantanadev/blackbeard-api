@@ -1,5 +1,6 @@
 package br.com.blackbeard.blackbeardapi.service;
 
+import br.com.blackbeard.blackbeardapi.exceptions.ObjectAlreadyCreatedException;
 import br.com.blackbeard.blackbeardapi.exceptions.ObjectNotFoundException;
 import br.com.blackbeard.blackbeardapi.models.Address;
 import br.com.blackbeard.blackbeardapi.models.BarberShop;
@@ -122,6 +123,62 @@ class BarberShopServiceTest {
         service.update(barberShop, persistedBarberShop.getId());
 
         verify(repository, times(1)).save(expected);
+    }
 
+    @Test
+    void shouldSaveAddress() {
+        var address = Address.builder()
+                .id(UUID.randomUUID())
+                .city("New jersey")
+                .district("test")
+                .street("Franklyn")
+                .number("39")
+                .build();
+
+        var persistedBarberShop = BarberShop.builder()
+                .id(UUID.randomUUID())
+                .name("test")
+                .imageUrl("http://www.teste.com")
+                .build();
+
+        var expected = BarberShop.builder()
+                .id(persistedBarberShop.getId())
+                .name(persistedBarberShop.getName())
+                .imageUrl(persistedBarberShop.getImageUrl())
+                .address(address)
+                .build();
+
+        when(repository.findById(persistedBarberShop.getId())).thenReturn(Optional.of(persistedBarberShop));
+
+        service.saveAddress(address, persistedBarberShop.getId());
+
+        verify(repository).save(barberShopCaptor.capture());
+
+        assertThat(barberShopCaptor.getValue()).isEqualTo(expected);
+    }
+
+    @Test
+    void shouldThrowAnExceptionWhenBarberShopAlreadyHasAddress() {
+        var address = Address.builder()
+                .id(UUID.randomUUID())
+                .city("New jersey")
+                .district("test")
+                .street("Franklyn")
+                .number("39")
+                .build();
+
+        var persistedBarberShop = BarberShop.builder()
+                .id(UUID.randomUUID())
+                .address(address)
+                .name("test")
+                .imageUrl("http://www.teste.com")
+                .build();
+
+        when(repository.findById(persistedBarberShop.getId())).thenReturn(Optional.of(persistedBarberShop));
+
+        final var exception = assertThrows(ObjectAlreadyCreatedException.class,
+                () -> service.saveAddress(address, persistedBarberShop.getId()));
+
+        assertThat(exception.getMessage()).isEqualTo("Address already created. Try update it");
     }
 }

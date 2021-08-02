@@ -21,7 +21,7 @@ public class BarberShopService {
     private final BarberShopRepository repository;
 
     @Autowired
-    public BarberShopService(BarberShopRepository repository, AddressService addressService) {
+    public BarberShopService(BarberShopRepository repository) {
         this.repository = repository;
     }
 
