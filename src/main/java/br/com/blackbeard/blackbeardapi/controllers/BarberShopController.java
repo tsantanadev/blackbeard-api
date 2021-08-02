@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.util.UUID;
@@ -23,7 +24,13 @@ public class BarberShopController {
     @PostMapping
     public ResponseEntity<BarberShopResponse> insert(@RequestBody @Valid BarberShopRequest request) {
         var barberShop = service.save(BarberShopMapper.convertToModel(request));
-        return ResponseEntity.ok(BarberShopMapper.convertToResponse(barberShop));
+        var uri =
+                ServletUriComponentsBuilder.fromCurrentRequest()
+                        .path("/{Id}")
+                        .buildAndExpand(barberShop.getId())
+                        .toUri();
+
+        return ResponseEntity.created(uri).body(BarberShopMapper.convertToResponse(barberShop));
     }
 
     @PutMapping
