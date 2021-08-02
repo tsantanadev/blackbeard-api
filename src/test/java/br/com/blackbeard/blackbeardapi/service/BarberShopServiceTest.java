@@ -1,5 +1,6 @@
 package br.com.blackbeard.blackbeardapi.service;
 
+import br.com.blackbeard.blackbeardapi.exceptions.ObjectAlreadyCreatedException;
 import br.com.blackbeard.blackbeardapi.exceptions.ObjectNotFoundException;
 import br.com.blackbeard.blackbeardapi.models.Address;
 import br.com.blackbeard.blackbeardapi.models.BarberShop;
@@ -30,9 +31,6 @@ class BarberShopServiceTest {
 
     @Mock
     private BarberShopRepository repository;
-
-    @Mock
-    private AddressService addressService;
 
     @Captor
     ArgumentCaptor<BarberShop> barberShopCaptor;
@@ -74,14 +72,9 @@ class BarberShopServiceTest {
 
     @Test
     void shouldCreateAnBarberShop() {
-        var newAddress = Address.builder().id(null).build();
         var newBarberShop = BarberShop.builder()
                 .id(null)
-                .address(newAddress)
                 .build();
-
-        when(addressService.save(newAddress))
-                .thenReturn(Address.builder().id(UUID.randomUUID()).build());
 
         service.save(newBarberShop);
 
@@ -89,7 +82,6 @@ class BarberShopServiceTest {
         var result = barberShopCaptor.getValue();
 
         assertThat(result.getId()).isNotNull();
-        assertThat(result.getAddress().getId()).isNotNull();
     }
 
     @Test
@@ -131,6 +123,64 @@ class BarberShopServiceTest {
         service.update(barberShop, persistedBarberShop.getId());
 
         verify(repository, times(1)).save(expected);
+    }
 
+    @Test
+    void shouldSaveAddress() {
+        var address = Address.builder()
+                .id(UUID.randomUUID())
+                .city("New jersey")
+                .district("test")
+                .street("Franklyn")
+                .number("39")
+                .build();
+
+        var persistedBarberShop = BarberShop.builder()
+                .id(UUID.randomUUID())
+                .name("test")
+                .imageUrl("http://www.teste.com")
+                .build();
+
+        var expected = BarberShop.builder()
+                .id(persistedBarberShop.getId())
+                .name(persistedBarberShop.getName())
+                .imageUrl(persistedBarberShop.getImageUrl())
+                .address(address)
+                .build();
+
+        when(repository.findById(persistedBarberShop.getId())).thenReturn(Optional.of(persistedBarberShop));
+
+        service.saveAddress(address, persistedBarberShop.getId());
+
+        verify(repository).save(barberShopCaptor.capture());
+
+        assertThat(barberShopCaptor.getValue()).isEqualTo(expected);
+    }
+
+    @Test
+    void shouldThrowAnExceptionWhenBarberShopAlreadyHasAddress() {
+        var barberShopId = UUID.randomUUID();
+
+        var address = Address.builder()
+                .id(UUID.randomUUID())
+                .city("New jersey")
+                .district("test")
+                .street("Franklyn")
+                .number("39")
+                .build();
+
+        var persistedBarberShop = BarberShop.builder()
+                .id(barberShopId)
+                .address(address)
+                .name("test")
+                .imageUrl("http://www.teste.com")
+                .build();
+
+        when(repository.findById(persistedBarberShop.getId())).thenReturn(Optional.of(persistedBarberShop));
+
+        final var exception = assertThrows(ObjectAlreadyCreatedException.class,
+                () -> service.saveAddress(address, barberShopId));
+
+        assertThat(exception.getMessage()).isEqualTo("Address already created. Try update it");
     }
 }
