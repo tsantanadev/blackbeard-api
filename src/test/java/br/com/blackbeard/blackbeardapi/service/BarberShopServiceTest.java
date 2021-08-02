@@ -159,6 +159,8 @@ class BarberShopServiceTest {
 
     @Test
     void shouldThrowAnExceptionWhenBarberShopAlreadyHasAddress() {
+        var barberShopId = UUID.randomUUID();
+
         var address = Address.builder()
                 .id(UUID.randomUUID())
                 .city("New jersey")
@@ -168,7 +170,7 @@ class BarberShopServiceTest {
                 .build();
 
         var persistedBarberShop = BarberShop.builder()
-                .id(UUID.randomUUID())
+                .id(barberShopId)
                 .address(address)
                 .name("test")
                 .imageUrl("http://www.teste.com")
@@ -177,7 +179,7 @@ class BarberShopServiceTest {
         when(repository.findById(persistedBarberShop.getId())).thenReturn(Optional.of(persistedBarberShop));
 
         final var exception = assertThrows(ObjectAlreadyCreatedException.class,
-                () -> service.saveAddress(address, persistedBarberShop.getId()));
+                () -> service.saveAddress(address, barberShopId));
 
         assertThat(exception.getMessage()).isEqualTo("Address already created. Try update it");
     }

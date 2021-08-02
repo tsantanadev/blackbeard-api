@@ -5,6 +5,8 @@ import br.com.blackbeard.blackbeardapi.models.Address;
 import br.com.blackbeard.blackbeardapi.service.AddressService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -15,7 +17,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.Map;
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -30,6 +34,12 @@ class AddressControllerTest {
 
     @MockBean
     private AddressService service;
+
+    @Captor
+    ArgumentCaptor<Address> addressCaptor;
+
+    @Captor
+    ArgumentCaptor<UUID> idCaptor;
 
     private final ObjectMapper mapper = new ObjectMapper();
 
@@ -72,6 +82,11 @@ class AddressControllerTest {
                 .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(content().string(responseJson));
+
+        verify(service).save(addressCaptor.capture(), idCaptor.capture());
+
+        assertThat(addressCaptor.getValue()).isEqualTo(address);
+        assertThat(idCaptor.getValue()).isEqualTo(barberShopId);
     }
 
     @Test
