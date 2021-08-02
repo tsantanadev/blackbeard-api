@@ -31,9 +31,6 @@ class BarberShopServiceTest {
     @Mock
     private BarberShopRepository repository;
 
-    @Mock
-    private AddressService addressService;
-
     @Captor
     ArgumentCaptor<BarberShop> barberShopCaptor;
 
@@ -74,14 +71,9 @@ class BarberShopServiceTest {
 
     @Test
     void shouldCreateAnBarberShop() {
-        var newAddress = Address.builder().id(null).build();
         var newBarberShop = BarberShop.builder()
                 .id(null)
-                .address(newAddress)
                 .build();
-
-        when(addressService.save(newAddress))
-                .thenReturn(Address.builder().id(UUID.randomUUID()).build());
 
         service.save(newBarberShop);
 
@@ -89,7 +81,6 @@ class BarberShopServiceTest {
         var result = barberShopCaptor.getValue();
 
         assertThat(result.getId()).isNotNull();
-        assertThat(result.getAddress().getId()).isNotNull();
     }
 
     @Test

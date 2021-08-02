@@ -1,10 +1,8 @@
 package br.com.blackbeard.blackbeardapi.controllers;
 
-import br.com.blackbeard.blackbeardapi.dtos.address.AddressRequest;
 import br.com.blackbeard.blackbeardapi.dtos.barbershop.BarberShopRequest;
 import br.com.blackbeard.blackbeardapi.dtos.barbershop.BarberShopResponse;
 import br.com.blackbeard.blackbeardapi.exceptions.ObjectNotFoundException;
-import br.com.blackbeard.blackbeardapi.models.Address;
 import br.com.blackbeard.blackbeardapi.models.BarberShop;
 import br.com.blackbeard.blackbeardapi.service.BarberShopService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -45,31 +43,14 @@ class BarberShopControllerTest {
 
     @Test
     void shouldReturnCreatedWhenPostAValidRequest() throws Exception {
-        var addressRequest = AddressRequest.builder()
-                .city("Test")
-                .district("Test")
-                .street("Test")
-                .number("42")
-                .build();
-
-
         var barberShopRequest = BarberShopRequest.builder()
                 .name("Test")
                 .imageUrl("https://www.google.com")
-                .address(addressRequest)
-                .build();
-
-        var address = Address.builder()
-                .city(addressRequest.getCity())
-                .district(addressRequest.getDistrict())
-                .street(addressRequest.getStreet())
-                .number(addressRequest.getNumber())
                 .build();
 
         var barberShop = BarberShop.builder()
                 .name(barberShopRequest.getName())
                 .imageUrl(barberShopRequest.getImageUrl())
-                .address(address)
                 .build();
 
         var barberShopReturned = BarberShop.builder()
@@ -100,7 +81,6 @@ class BarberShopControllerTest {
         var barberShopRequest = BarberShopRequest.builder().build();
 
         var errors = Map.of(
-                "address", "must not be null",
                 "imageUrl", "must not be blank",
                 "name", "must not be blank"
         );
@@ -117,31 +97,14 @@ class BarberShopControllerTest {
 
     @Test
     void shouldReturnAcceptWhenPutAValidRequest() throws Exception {
-        var addressRequest = AddressRequest.builder()
-                .city("Test")
-                .district("Test")
-                .street("Test")
-                .number("42")
-                .build();
-
-
         var barberShopRequest = BarberShopRequest.builder()
                 .name("Test")
                 .imageUrl("https://www.google.com")
-                .address(addressRequest)
-                .build();
-
-        var address = Address.builder()
-                .city(addressRequest.getCity())
-                .district(addressRequest.getDistrict())
-                .street(addressRequest.getStreet())
-                .number(addressRequest.getNumber())
                 .build();
 
         var barberShop = BarberShop.builder()
                 .name(barberShopRequest.getName())
                 .imageUrl(barberShopRequest.getImageUrl())
-                .address(address)
                 .build();
 
         var barberShopId = UUID.randomUUID();
@@ -163,7 +126,6 @@ class BarberShopControllerTest {
         var barberShopId = UUID.randomUUID();
 
         var errors = Map.of(
-                "address", "must not be null",
                 "imageUrl", "must not be blank",
                 "name", "must not be blank"
         );
