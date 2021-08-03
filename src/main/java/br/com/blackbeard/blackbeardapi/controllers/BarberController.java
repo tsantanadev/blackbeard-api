@@ -1,7 +1,6 @@
 package br.com.blackbeard.blackbeardapi.controllers;
 
 import br.com.blackbeard.blackbeardapi.dtos.barber.BarberRequest;
-import br.com.blackbeard.blackbeardapi.dtos.barber.BarberRequestUpdate;
 import br.com.blackbeard.blackbeardapi.dtos.barber.BarberResponse;
 import br.com.blackbeard.blackbeardapi.mappers.BarberMapper;
 import br.com.blackbeard.blackbeardapi.service.BarberService;
@@ -23,8 +22,9 @@ public class BarberController {
     private BarberService service;
 
     @PostMapping
-    public ResponseEntity<BarberResponse> insert(@RequestBody @Valid BarberRequest barberRequest) {
-        var barber = service.save(BarberMapper.convertToModel(barberRequest), barberRequest.getBarberShopId());
+    public ResponseEntity<BarberResponse> insert(@RequestBody @Valid BarberRequest barberRequest,
+                                                 @RequestParam("idBarberShop") UUID idBarberShop) {
+        var barber = service.save(BarberMapper.convertToModel(barberRequest), idBarberShop);
         var uri =
                 ServletUriComponentsBuilder.fromCurrentRequest()
                         .path("/{Id}")
@@ -45,7 +45,7 @@ public class BarberController {
     }
 
     @PutMapping
-    public ResponseEntity<Void> update(@RequestBody @Valid BarberRequestUpdate request,
+    public ResponseEntity<Void> update(@RequestBody @Valid BarberRequest request,
                                        @RequestParam("idBarber") UUID idBarber) {
         service.update(BarberMapper.convertToModel(request), idBarber);
         return ResponseEntity.accepted().build();

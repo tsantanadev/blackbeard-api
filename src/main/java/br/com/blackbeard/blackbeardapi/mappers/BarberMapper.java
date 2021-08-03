@@ -1,7 +1,6 @@
 package br.com.blackbeard.blackbeardapi.mappers;
 
 import br.com.blackbeard.blackbeardapi.dtos.barber.BarberRequest;
-import br.com.blackbeard.blackbeardapi.dtos.barber.BarberRequestUpdate;
 import br.com.blackbeard.blackbeardapi.dtos.barber.BarberResponse;
 import br.com.blackbeard.blackbeardapi.models.Barber;
 import org.modelmapper.ModelMapper;
@@ -16,10 +15,6 @@ public class BarberMapper {
     }
 
     public static Barber convertToModel(BarberRequest request) {
-        return mapper.map(request, Barber.class);
-    }
-
-    public static Barber convertToModel(BarberRequestUpdate request) {
         return mapper.map(request, Barber.class);
     }
 
