@@ -2,7 +2,6 @@ package br.com.blackbeard.blackbeardapi.controllers;
 
 
 import br.com.blackbeard.blackbeardapi.dtos.barber.BarberRequest;
-import br.com.blackbeard.blackbeardapi.dtos.barber.BarberRequestUpdate;
 import br.com.blackbeard.blackbeardapi.dtos.barber.BarberResponse;
 import br.com.blackbeard.blackbeardapi.exceptions.ObjectNotFoundException;
 import br.com.blackbeard.blackbeardapi.models.Barber;
@@ -49,7 +48,6 @@ class BarberControllerTest {
 
         var barberRequest = BarberRequest.builder()
                 .name("teste")
-                .barberShopId(barberShop.getId())
                 .build();
 
         var barber = Barber.builder()
@@ -67,12 +65,13 @@ class BarberControllerTest {
                 .name(barberReturned.getName())
                 .build();
 
-        when(service.save(barber, barberRequest.getBarberShopId())).thenReturn(barberReturned);
+        when(service.save(barber, barberShop.getId())).thenReturn(barberReturned);
 
         var json = mapper.writeValueAsString(barberRequest);
 
         mockMvc.perform(
                 MockMvcRequestBuilders.post("/barber")
+                        .param("idBarberShop", barberShop.getId().toString())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isCreated())
@@ -84,8 +83,7 @@ class BarberControllerTest {
         var barberRequest = BarberRequest.builder().build();
 
         var errors = Map.of(
-                "name", "must not be blank",
-                "barberShopId", "must not be null"
+                "name", "must not be blank"
         );
 
         var requestJson = mapper.writeValueAsString(barberRequest);
@@ -156,12 +154,13 @@ class BarberControllerTest {
 
     @Test
     void shouldReturnNotFoundWhenGetAllIdBarberShopInvalid() throws Exception {
-        when(service.listAllBarberByIdBarberShop(UUID.randomUUID(), PageRequest.of(0, 1)))
+        var id = UUID.randomUUID();
+        when(service.listAllBarberByIdBarberShop(id, PageRequest.of(0, 20)))
                 .thenThrow(ObjectNotFoundException.class);
 
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/barber")
-                        .param("idBarberShop", UUID.randomUUID().toString())
+                        .param("idBarberShop", id.toString())
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isNotFound());
@@ -171,7 +170,7 @@ class BarberControllerTest {
     void shouldReturnAcceptWhenPutAValidRequest() throws Exception {
         var id = UUID.randomUUID();
 
-        var barberRequest = BarberRequestUpdate.builder()
+        var barberRequest = BarberRequest.builder()
                 .name("teste")
                 .build();
 
@@ -194,7 +193,7 @@ class BarberControllerTest {
     @Test
     void shouldReturnBadRequestWhenPutAnInvalidRequest() throws Exception {
         var id = UUID.randomUUID();
-        var barberRequest = BarberRequestUpdate.builder().build();
+        var barberRequest = BarberRequest.builder().build();
 
         var errors = Map.of(
                 "name", "must not be blank"
