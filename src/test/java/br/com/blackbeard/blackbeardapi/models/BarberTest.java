@@ -6,7 +6,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class BarberTest {
+class BarberTest {
 
     @Test
     void shouldUpdate() {

@@ -16,7 +16,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/barber")
-public class BarberController {
+class BarberController {
 
     @Autowired
     private BarberService service;

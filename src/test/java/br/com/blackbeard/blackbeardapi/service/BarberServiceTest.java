@@ -89,10 +89,11 @@ public class BarberServiceTest {
 
     @Test
     void shouldThrowExceptionWhenFindABarberById() {
-        when(repository.findById(barber.getId())).thenReturn(Optional.empty());
+        var barberId = UUID.randomUUID();
+        when(repository.findById(barberId)).thenReturn(Optional.empty());
 
         var exception = assertThrows(ObjectNotFoundException.class,
-                () -> service.findById(barber.getId()));
+                () -> service.findById(barberId));
 
         assertThat(exception).hasMessage("Object not found");
     }
