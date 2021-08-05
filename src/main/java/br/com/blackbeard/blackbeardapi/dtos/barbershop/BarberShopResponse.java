@@ -17,6 +17,7 @@ import java.util.UUID;
 public class BarberShopResponse {
     private UUID id;
     private String name;
+    private String urlLogo;
     private List<Image> images;
     private Address address;
 }

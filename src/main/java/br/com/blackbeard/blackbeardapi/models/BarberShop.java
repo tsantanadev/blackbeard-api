@@ -24,6 +24,7 @@ public class BarberShop {
     @Id
     private UUID id;
     private String name;
+    private String urlLogo;
 
     @ManyToOne
     private Address address;
@@ -42,6 +43,7 @@ public class BarberShop {
 
     public void update(BarberShop barberShop) {
         this.name = barberShop.getName();
+        this.urlLogo = barberShop.getUrlLogo();
     }
 
     public void generateId() {
