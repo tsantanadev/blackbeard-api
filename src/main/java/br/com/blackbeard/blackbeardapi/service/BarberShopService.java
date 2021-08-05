@@ -5,7 +5,7 @@ import br.com.blackbeard.blackbeardapi.exceptions.ObjectNotFoundException;
 import br.com.blackbeard.blackbeardapi.models.Address;
 import br.com.blackbeard.blackbeardapi.models.BarberShop;
 import br.com.blackbeard.blackbeardapi.repositories.BarberShopRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -16,19 +16,21 @@ import java.util.UUID;
 import static java.util.Objects.nonNull;
 
 @Service
+@AllArgsConstructor
 public class BarberShopService {
 
     private final BarberShopRepository repository;
-
-    @Autowired
-    public BarberShopService(BarberShopRepository repository) {
-        this.repository = repository;
-    }
+    private final ImageService imageService;
 
     @Transactional
     public BarberShop save(BarberShop barberShop) {
         barberShop.generateId();
-        return repository.save(barberShop);
+        final var persistedBarberShop = repository.save(barberShop);
+
+        var images = imageService.saveImages(persistedBarberShop);
+        persistedBarberShop.setImages(images);
+
+        return persistedBarberShop;
     }
 
     @Transactional

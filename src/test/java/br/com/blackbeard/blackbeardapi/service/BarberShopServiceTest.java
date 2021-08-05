@@ -32,6 +32,9 @@ class BarberShopServiceTest {
     @Mock
     private BarberShopRepository repository;
 
+    @Mock
+    private ImageService imageService;
+
     @Captor
     ArgumentCaptor<BarberShop> barberShopCaptor;
 
@@ -76,12 +79,13 @@ class BarberShopServiceTest {
                 .id(null)
                 .build();
 
+        when(repository.save(any())).thenReturn(BarberShop.builder()
+                .id(UUID.randomUUID())
+                .build());
+
         service.save(newBarberShop);
 
-        verify(repository).save(barberShopCaptor.capture());
-        var result = barberShopCaptor.getValue();
-
-        assertThat(result.getId()).isNotNull();
+        assertThat(newBarberShop.getId()).isNotNull();
     }
 
     @Test
@@ -100,21 +104,18 @@ class BarberShopServiceTest {
         var persistedBarberShop = BarberShop.builder()
                 .id(UUID.randomUUID())
                 .name("teste")
-                .imageUrl("http://www.teste.com")
                 .address(Address.builder().build())
                 .build();
 
         var barberShop = BarberShop.builder()
                 .id(UUID.randomUUID())
                 .name("teste 2")
-                .imageUrl("http://www.teste2.com")
                 .address(Address.builder().build())
                 .build();
 
         var expected = BarberShop.builder()
                 .id(persistedBarberShop.getId())
                 .name(barberShop.getName())
-                .imageUrl(barberShop.getImageUrl())
                 .address(persistedBarberShop.getAddress())
                 .build();
 
@@ -138,13 +139,11 @@ class BarberShopServiceTest {
         var persistedBarberShop = BarberShop.builder()
                 .id(UUID.randomUUID())
                 .name("test")
-                .imageUrl("http://www.teste.com")
                 .build();
 
         var expected = BarberShop.builder()
                 .id(persistedBarberShop.getId())
                 .name(persistedBarberShop.getName())
-                .imageUrl(persistedBarberShop.getImageUrl())
                 .address(address)
                 .build();
 
@@ -173,7 +172,6 @@ class BarberShopServiceTest {
                 .id(barberShopId)
                 .address(address)
                 .name("test")
-                .imageUrl("http://www.teste.com")
                 .build();
 
         when(repository.findById(persistedBarberShop.getId())).thenReturn(Optional.of(persistedBarberShop));

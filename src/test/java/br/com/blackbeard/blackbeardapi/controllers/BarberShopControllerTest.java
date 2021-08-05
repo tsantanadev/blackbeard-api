@@ -45,24 +45,20 @@ class BarberShopControllerTest {
     void shouldReturnCreatedWhenPostAValidRequest() throws Exception {
         var barberShopRequest = BarberShopRequest.builder()
                 .name("Test")
-                .imageUrl("https://www.google.com")
                 .build();
 
         var barberShop = BarberShop.builder()
                 .name(barberShopRequest.getName())
-                .imageUrl(barberShopRequest.getImageUrl())
                 .build();
 
         var barberShopReturned = BarberShop.builder()
                 .id(UUID.randomUUID())
                 .name(barberShopRequest.getName())
-                .imageUrl(barberShopRequest.getImageUrl())
                 .build();
 
         var barberShopResponseExpected = BarberShopResponse.builder()
                 .id(barberShopReturned.getId())
                 .name(barberShopReturned.getName())
-                .imageUrl(barberShopReturned.getImageUrl())
                 .build();
 
         when(service.save(barberShop)).thenReturn(barberShopReturned);
@@ -81,7 +77,6 @@ class BarberShopControllerTest {
         var barberShopRequest = BarberShopRequest.builder().build();
 
         var errors = Map.of(
-                "imageUrl", "must not be blank",
                 "name", "must not be blank"
         );
 
@@ -99,12 +94,10 @@ class BarberShopControllerTest {
     void shouldReturnAcceptWhenPutAValidRequest() throws Exception {
         var barberShopRequest = BarberShopRequest.builder()
                 .name("Test")
-                .imageUrl("https://www.google.com")
                 .build();
 
         var barberShop = BarberShop.builder()
                 .name(barberShopRequest.getName())
-                .imageUrl(barberShopRequest.getImageUrl())
                 .build();
 
         var barberShopId = UUID.randomUUID();
@@ -126,7 +119,6 @@ class BarberShopControllerTest {
         var barberShopId = UUID.randomUUID();
 
         var errors = Map.of(
-                "imageUrl", "must not be blank",
                 "name", "must not be blank"
         );
 
