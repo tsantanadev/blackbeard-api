@@ -26,6 +26,7 @@ public class BarberShop {
     private String name;
     private String urlLogo;
 
+    @JsonIgnore
     @ManyToOne
     private Address address;
 
@@ -37,7 +38,7 @@ public class BarberShop {
     @OneToMany(mappedBy = "barberShop")
     private List<Barber> barber;
 
-    @JsonManagedReference
+    @JsonIgnore
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "barberShop")
     private List<Image> images;
 
