@@ -25,6 +25,7 @@ public class BarberShopService {
     @Transactional
     public BarberShop save(BarberShop barberShop) {
         barberShop.generateId();
+        barberShop.setUrlLogo("https://image.freepik.com/free-vector/gentleman-barber-shop-logo_96485-97.jpg");
         final var persistedBarberShop = repository.save(barberShop);
 
         var images = imageService.saveImages(persistedBarberShop);
