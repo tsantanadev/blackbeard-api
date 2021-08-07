@@ -25,15 +25,19 @@ public class Barber {
     private UUID id;
     private String name;
 
-    @CreatedDate
-    private LocalDateTime createdDate;
-
     @ManyToOne
     private BarberShop barberShop;
+
+    @OneToOne
+    @JoinColumn(name = "schedule_id")
+    private BarberSchedule schedule;
 
     @JsonIgnore
     @OneToMany(mappedBy = "barber")
     private List<Service> services;
+
+    @CreatedDate
+    private LocalDateTime createdDate;
 
     public void generateId() {
         this.id = UUID.randomUUID();

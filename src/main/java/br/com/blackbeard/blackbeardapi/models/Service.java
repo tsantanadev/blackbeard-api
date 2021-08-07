@@ -15,7 +15,7 @@ public class Service {
     private String name;
     private String description;
     private BigDecimal price;
-    private BigDecimal duration;
+    private Integer duration;
 
     @ManyToOne
     private Barber barber;

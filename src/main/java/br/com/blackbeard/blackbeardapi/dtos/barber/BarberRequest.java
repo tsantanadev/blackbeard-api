@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @Data
 @Builder
@@ -15,4 +16,5 @@ public class BarberRequest {
 
     @NotBlank
     private String name;
+
 }

@@ -25,7 +25,6 @@ public class BarberShop {
     private String name;
     private String urlLogo;
 
-    @JsonIgnore
     @ManyToOne
     private Address address;
 
@@ -33,11 +32,9 @@ public class BarberShop {
     @CreatedDate
     private LocalDateTime createdDate;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "barberShop")
     private List<Barber> barber;
 
-    @JsonIgnore
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "barberShop")
     private List<Image> images;
 
