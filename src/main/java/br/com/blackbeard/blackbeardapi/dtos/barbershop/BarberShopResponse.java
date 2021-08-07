@@ -1,7 +1,7 @@
 package br.com.blackbeard.blackbeardapi.dtos.barbershop;
 
+import br.com.blackbeard.blackbeardapi.dtos.image.ImageResponse;
 import br.com.blackbeard.blackbeardapi.models.Address;
-import br.com.blackbeard.blackbeardapi.models.Image;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,6 +18,6 @@ public class BarberShopResponse {
     private UUID id;
     private String name;
     private String urlLogo;
-    private List<Image> images;
+    private List<ImageResponse> images;
     private Address address;
 }
