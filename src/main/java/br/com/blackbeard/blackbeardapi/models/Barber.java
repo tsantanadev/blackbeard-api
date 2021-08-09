@@ -33,7 +33,7 @@ public class Barber {
 
     @JsonIgnore
     @OneToMany(mappedBy = "barber")
-    private List<Service> services;
+    private List<ServiceBarber> serviceBarbers;
 
     public void generateId() {
         this.id = UUID.randomUUID();
