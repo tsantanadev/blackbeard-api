@@ -7,11 +7,11 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class ServiceBarberTest {
+class BarberServiceModelTest {
 
     @Test
     void shouldUpdate() {
-        var persistedService = ServiceBarber.builder()
+        var persistedService = BarberServiceModel.builder()
                 .id(UUID.randomUUID())
                 .name("teste")
                 .description("teste teste teste teste teste")
@@ -20,7 +20,7 @@ class ServiceBarberTest {
                 .barber(Barber.builder().build())
                 .build();
 
-        var serviceBarberUpdate = ServiceBarber.builder()
+        var serviceBarberUpdate = BarberServiceModel.builder()
                 .id(UUID.randomUUID())
                 .name("teste 2")
                 .description("teste teste teste teste teste 2")
@@ -28,7 +28,7 @@ class ServiceBarberTest {
                 .duration(BigDecimal.valueOf(5))
                 .build();
 
-        var excepted = ServiceBarber.builder()
+        var excepted = BarberServiceModel.builder()
                 .id(persistedService.getId())
                 .name(serviceBarberUpdate.getName())
                 .description(serviceBarberUpdate.getDescription())
@@ -44,7 +44,7 @@ class ServiceBarberTest {
 
     @Test
     void shouldGenerateId() {
-        var service = ServiceBarber.builder().build();
+        var service = BarberServiceModel.builder().build();
 
         service.generateId();
 

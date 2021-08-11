@@ -15,16 +15,16 @@ import javax.validation.Valid;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/service")
+@RequestMapping("/barber/service")
 @RequiredArgsConstructor
-public class ServiceBarberController {
+public class BarberServiceController {
 
     private final ServiceBarberService service;
 
     @PostMapping
     public ResponseEntity<ServiceResponse> insert(@RequestBody @Valid ServiceRequest serviceRequest,
-                                                  @RequestParam("idBarber") UUID idBarber) {
-        var serviceBarber = service.save(ServiceMapper.convertToModel(serviceRequest), idBarber);
+                                                  @RequestParam("barberId") UUID barberId) {
+        var serviceBarber = service.save(ServiceMapper.convertToModel(serviceRequest), barberId);
 
         var uri =
                 ServletUriComponentsBuilder.fromCurrentRequest()
@@ -35,8 +35,8 @@ public class ServiceBarberController {
     }
 
     @GetMapping
-    public Page<ServiceResponse> listAll(@RequestParam("idBarber") UUID idBarber, Pageable pageable) {
-        return service.listAllServiceByIdBarber(idBarber, pageable)
+    public Page<ServiceResponse> listAll(@RequestParam("barberId") UUID barberId, Pageable pageable) {
+        return service.listAllServiceByIdBarber(barberId, pageable)
                 .map(ServiceMapper::convertToResponse);
     }
 
@@ -47,8 +47,8 @@ public class ServiceBarberController {
 
     @PutMapping
     public ResponseEntity<Void> update(@RequestBody @Valid ServiceRequest request,
-                                       @RequestParam("idService") UUID idService) {
-        service.update(ServiceMapper.convertToModel(request), idService);
+                                       @RequestParam("serviceId") UUID serviceId) {
+        service.update(ServiceMapper.convertToModel(request), serviceId);
         return ResponseEntity.accepted().build();
     }
 

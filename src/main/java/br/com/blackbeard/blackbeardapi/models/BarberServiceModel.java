@@ -16,7 +16,7 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ServiceBarber {
+public class BarberServiceModel {
 
     @Id
     private UUID id;
@@ -32,7 +32,7 @@ public class ServiceBarber {
         this.id = UUID.randomUUID();
     }
 
-    public void update(ServiceBarber service) {
+    public void update(BarberServiceModel service) {
         this.name = service.getName();
         this.description = service.getDescription();
         this.price = service.getPrice();

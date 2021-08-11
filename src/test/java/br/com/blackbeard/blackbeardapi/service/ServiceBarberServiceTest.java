@@ -2,7 +2,7 @@ package br.com.blackbeard.blackbeardapi.service;
 
 import br.com.blackbeard.blackbeardapi.exceptions.ObjectNotFoundException;
 import br.com.blackbeard.blackbeardapi.models.Barber;
-import br.com.blackbeard.blackbeardapi.models.ServiceBarber;
+import br.com.blackbeard.blackbeardapi.models.BarberServiceModel;
 import br.com.blackbeard.blackbeardapi.repositories.ServiceRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,9 +36,9 @@ class ServiceBarberServiceTest {
     private BarberService barberService;
 
     @Captor
-    ArgumentCaptor<ServiceBarber> serviceCaptor;
+    ArgumentCaptor<BarberServiceModel> serviceCaptor;
 
-    private ServiceBarber serviceBarber;
+    private BarberServiceModel barberServiceModel;
 
     @BeforeEach
     void setup() {
@@ -46,7 +46,7 @@ class ServiceBarberServiceTest {
                 .id(UUID.randomUUID())
                 .build();
 
-        this.serviceBarber = ServiceBarber.builder()
+        this.barberServiceModel = BarberServiceModel.builder()
                 .id(UUID.randomUUID())
                 .barber(barber)
                 .build();
@@ -54,32 +54,32 @@ class ServiceBarberServiceTest {
 
     @Test
     void shouldFindAnServiceById() {
-        when(repository.findById(serviceBarber.getId())).thenReturn(Optional.of(serviceBarber));
+        when(repository.findById(barberServiceModel.getId())).thenReturn(Optional.of(barberServiceModel));
 
-        var result = service.findById(serviceBarber.getId());
+        var result = service.findById(barberServiceModel.getId());
 
-        assertThat(result).isEqualTo(serviceBarber);
-        verify(repository, times(1)).findById(serviceBarber.getId());
+        assertThat(result).isEqualTo(barberServiceModel);
+        verify(repository, times(1)).findById(barberServiceModel.getId());
     }
 
     @Test
     void shouldCreateAnService() {
-        var newService = ServiceBarber.builder()
+        var newService = BarberServiceModel.builder()
                 .id(null)
-                .barber(serviceBarber.getBarber())
+                .barber(barberServiceModel.getBarber())
                 .build();
 
 
-        when(barberService.findById(serviceBarber.getBarber().getId())).thenReturn(serviceBarber.getBarber());
+        when(barberService.findById(barberServiceModel.getBarber().getId())).thenReturn(barberServiceModel.getBarber());
 
-        service.save(newService, serviceBarber.getBarber().getId());
+        service.save(newService, barberServiceModel.getBarber().getId());
 
         verify(repository).save(serviceCaptor.capture());
 
         var result = serviceCaptor.getValue();
 
         assertThat(result.getId()).isNotNull();
-        assertThat(result.getBarber()).isEqualTo(serviceBarber.getBarber());
+        assertThat(result.getBarber()).isEqualTo(barberServiceModel.getBarber());
     }
 
     @Test
@@ -97,34 +97,34 @@ class ServiceBarberServiceTest {
     void shouldAllServiceByIdBarber() {
         final var pageable = PageRequest.of(20, 20);
 
-        when(repository.findAllByBarberId(serviceBarber.getBarber().getId(), pageable)).thenReturn(Page.empty());
+        when(repository.findAllByBarberId(barberServiceModel.getBarber().getId(), pageable)).thenReturn(Page.empty());
 
-        service.listAllServiceByIdBarber(serviceBarber.getBarber().getId(), pageable);
+        service.listAllServiceByIdBarber(barberServiceModel.getBarber().getId(), pageable);
 
         verify(repository, times(1))
-                .findAllByBarberId(serviceBarber.getBarber().getId(), pageable);
+                .findAllByBarberId(barberServiceModel.getBarber().getId(), pageable);
     }
 
     @Test
     void shouldUpdateAnServiceById() {
-        var persistedService = ServiceBarber.builder()
+        var persistedService = BarberServiceModel.builder()
                 .id(UUID.randomUUID())
                 .name("teste")
                 .description("teste teste teste teste teste")
                 .price(BigDecimal.valueOf(15.5))
                 .duration(BigDecimal.valueOf(10))
-                .barber(serviceBarber.getBarber())
+                .barber(barberServiceModel.getBarber())
                 .build();
 
-        var serviceBarberUpdate = ServiceBarber.builder()
+        var serviceBarberUpdate = BarberServiceModel.builder()
                 .name("teste 2")
                 .description("teste teste teste teste teste 2")
                 .price(BigDecimal.valueOf(5.5))
                 .duration(BigDecimal.valueOf(5))
-                .barber(serviceBarber.getBarber())
+                .barber(barberServiceModel.getBarber())
                 .build();
 
-        var excepted = ServiceBarber.builder()
+        var excepted = BarberServiceModel.builder()
                 .id(persistedService.getId())
                 .name(serviceBarberUpdate.getName())
                 .description(serviceBarberUpdate.getDescription())
