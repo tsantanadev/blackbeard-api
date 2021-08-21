@@ -51,17 +51,31 @@ public class BarberShopController {
         return ResponseEntity.ok(BarberShopMapper.convertToResponse(service.findById(id)));
     }
 
-    @PatchMapping("/logo")
+    @PostMapping("/logo")
     public ResponseEntity<Void> saveLogo(@RequestParam("barberShopId") UUID barberShopId,
                                          @RequestParam("logo") MultipartFile multipartFile) {
         var uri = service.saveLogo(barberShopId, multipartFile);
         return ResponseEntity.created(uri).build();
     }
 
-    @PatchMapping("/image")
+    @DeleteMapping("/logo")
+    public ResponseEntity<Void> deleteLogo(@RequestParam("barberShopId") UUID barberShopId) {
+        service.deleteLogo(barberShopId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/image")
     public ResponseEntity<Void> saveImage(@RequestParam("barberShopId") UUID barberShopId,
-                                         @RequestParam("image") MultipartFile multipartFile) {
+                                          @RequestParam("image") MultipartFile multipartFile) {
         var uri = service.saveImages(barberShopId, multipartFile);
         return ResponseEntity.created(uri).build();
     }
+
+    @DeleteMapping("/image")
+    public ResponseEntity<Void> deleteImage(@RequestParam("barberShopId") UUID barberShopId,
+                                            @RequestParam("imageId") UUID imageId) {
+        service.deleteImage(barberShopId, imageId);
+        return ResponseEntity.ok().build();
+    }
+
 }

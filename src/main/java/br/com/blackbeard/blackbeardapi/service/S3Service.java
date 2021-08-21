@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.UUID;
 
 @Service
 public class S3Service {
@@ -37,6 +38,10 @@ public class S3Service {
         } catch (URISyntaxException e) {
             throw new FileException("fail to convert URL to URI");
         }
+    }
+
+    public void deleteFile(UUID id) {
+        s3.deleteObject(bucket, id.toString());
     }
 
     private InputStream getPNGImageFromFile(MultipartFile multipartFile) {

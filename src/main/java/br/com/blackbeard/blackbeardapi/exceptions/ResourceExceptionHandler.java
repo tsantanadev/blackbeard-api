@@ -35,11 +35,11 @@ public class ResourceExceptionHandler {
     }
 
     @ExceptionHandler(FileException.class)
-    public ResponseEntity<StandardError> file(
+    public ResponseEntity<StandardError<String>> file(
             FileException e, HttpServletRequest request) {
         var exception = new StandardError<>(
                 HttpStatus.BAD_REQUEST.value(),
-                "error to read archive",
+                "error of archive",
                 e.getMessage(),
                 System.currentTimeMillis(),
                 request.getRequestURI());
@@ -47,13 +47,13 @@ public class ResourceExceptionHandler {
     }
 
     @ExceptionHandler(AmazonServiceException.class)
-    public ResponseEntity<StandardError> amazonService(
+    public ResponseEntity<StandardError<String>> amazonService(
             AmazonServiceException e, HttpServletRequest request) {
         HttpStatus code = HttpStatus.valueOf(e.getErrorCode());
         var exception =
                 new StandardError<>(
                         code.value(),
-                        "Erro",
+                        "Error amazon service",
                         e.getMessage(),
                         System.currentTimeMillis(),
                         request.getRequestURI());
@@ -61,12 +61,12 @@ public class ResourceExceptionHandler {
     }
 
     @ExceptionHandler(AmazonClientException.class)
-    public ResponseEntity<StandardError> amazonClient(
+    public ResponseEntity<StandardError<String>> amazonClient(
             AmazonClientException e, HttpServletRequest request) {
         var exception =
                 new StandardError<>(
                         HttpStatus.BAD_REQUEST.value(),
-                        "Erro",
+                        "Error amazon client",
                         e.getMessage(),
                         System.currentTimeMillis(),
                         request.getRequestURI());
@@ -74,12 +74,12 @@ public class ResourceExceptionHandler {
     }
 
     @ExceptionHandler(AmazonS3Exception.class)
-    public ResponseEntity<StandardError> amazonS3(
+    public ResponseEntity<StandardError<String>> amazonS3(
             AmazonS3Exception e, HttpServletRequest request) {
         var exception =
                 new StandardError<>(
                         HttpStatus.BAD_REQUEST.value(),
-                        "Erro",
+                        "Error amazon s3",
                         e.getMessage(),
                         System.currentTimeMillis(),
                         request.getRequestURI());

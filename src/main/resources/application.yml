@@ -28,7 +28,6 @@ server:
   port: 8080
 
 #AWS
-
 s3:
   bucket: ${BUCKETNAME}
   region: sa-east-1

@@ -61,14 +61,26 @@ public class BarberShopService {
 
     public URI saveLogo(UUID barberShopId, MultipartFile multipartFile) {
         var barberShop = findById(barberShopId);
-        var uriLogo = s3Service.uploadFile(multipartFile, barberShop.getName(), "logo");
+        var uriLogo = s3Service.uploadFile(multipartFile, barberShop.getId().toString(), "logo");
         barberShop.setUrlLogo(uriLogo.toString());
         repository.save(barberShop);
         return uriLogo;
     }
 
+    public void deleteLogo(UUID barberShopId) {
+        var barberShop = findById(barberShopId);
+        s3Service.deleteFile(barberShop.getId());
+        barberShop.setUrlLogo(null);
+        repository.save(barberShop);
+    }
+
     public URI saveImages(UUID barberShopId, MultipartFile multipartFile) {
         var barberShop = findById(barberShopId);
         return imageService.saveImages(barberShop, multipartFile);
+    }
+
+    public void deleteImage(UUID barberShopId, UUID imageId) {
+        var barberShop = findById(barberShopId);
+        imageService.deleteImage(barberShop, imageId);
     }
 }
