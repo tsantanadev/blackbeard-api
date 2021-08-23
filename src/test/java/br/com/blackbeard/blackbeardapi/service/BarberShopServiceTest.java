@@ -15,7 +15,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.mock.web.MockMultipartFile;
 
+import java.net.URI;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -34,6 +36,9 @@ class BarberShopServiceTest {
 
     @Mock
     private ImageService imageService;
+
+    @Mock
+    private S3Service s3Service;
 
     @Captor
     ArgumentCaptor<BarberShop> barberShopCaptor;
@@ -180,5 +185,92 @@ class BarberShopServiceTest {
                 () -> service.saveAddress(address, barberShopId));
 
         assertThat(exception.getMessage()).isEqualTo("Address already created. Try update it");
+    }
+
+    @Test
+    void shouldSaveAnLogo() {
+        var barberShopId = UUID.randomUUID();
+
+        var barberShop = BarberShop.builder()
+                .id(barberShopId)
+                .build();
+
+        var uri = URI.create("https://www.teste.com/");
+
+        var multipartFile = new MockMultipartFile("file", "test.png",
+                "text/plain", "Spring Framework".getBytes());
+
+        when(repository.findById(barberShopId)).thenReturn(Optional.of(barberShop));
+        when(s3Service.uploadFile(multipartFile, barberShop.getId().toString(), "logo"))
+                .thenReturn(uri);
+
+        service.saveLogo(barberShopId, multipartFile);
+
+        verify(repository).save(barberShopCaptor.capture());
+
+        assertThat(barberShopCaptor.getValue().getUrlLogo()).isEqualTo(uri.toString());
+
+    }
+
+    @Test
+    void shouldSaveAnImage() {
+        var barberShopId = UUID.randomUUID();
+
+        var barberShop = BarberShop.builder()
+                .id(barberShopId)
+                .build();
+
+        var uri = URI.create("https://www.teste.com/");
+
+        var multipartFile = new MockMultipartFile("file", "test.png",
+                "text/plain", "Spring Framework".getBytes());
+
+        when(repository.findById(barberShopId)).thenReturn(Optional.of(barberShop));
+        when(imageService.saveImages(barberShop, multipartFile)).thenReturn(uri);
+
+        var uriImage = service.saveImages(barberShopId, multipartFile);
+
+        verify(imageService, times(1)).saveImages(barberShop, multipartFile);
+        assertThat(uriImage).isEqualTo(uri);
+
+    }
+
+    @Test
+    void shouldDeleteAnLogoBarberShop() {
+        var barberShopId = UUID.randomUUID();
+
+        var uri = URI.create("https://www.teste.com/");
+
+        var barberShop = BarberShop.builder()
+                .id(barberShopId)
+                .urlLogo(uri.toString())
+                .build();
+
+        when(repository.findById(barberShopId)).thenReturn(Optional.of(barberShop));
+
+        service.deleteLogo(barberShopId);
+
+        verify(repository).save(barberShopCaptor.capture());
+
+        verify(s3Service, times(1)).deleteFile(barberShopId);
+
+        assertThat(barberShopCaptor.getValue().getUrlLogo()).isNull();
+    }
+
+    @Test
+    void shouldDeleteAnImageBarberShop() {
+        var barberShopId = UUID.randomUUID();
+
+        var imageId = UUID.randomUUID();
+
+        var barberShop = BarberShop.builder()
+                .id(barberShopId)
+                .build();
+
+        when(repository.findById(barberShopId)).thenReturn(Optional.of(barberShop));
+
+        service.deleteImage(barberShopId, imageId);
+
+        verify(imageService, times(1)).deleteImage(barberShop, imageId);
     }
 }

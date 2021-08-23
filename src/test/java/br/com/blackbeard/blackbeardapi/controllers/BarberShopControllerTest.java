@@ -14,9 +14,12 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.UUID;
 
@@ -25,8 +28,7 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -83,8 +85,8 @@ class BarberShopControllerTest {
         var requestJson = mapper.writeValueAsString(barberShopRequest);
 
         mockMvc.perform(post("/barberShop")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestJson))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestJson))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message", is(errors)))
                 .andExpect(jsonPath("$.status", is(HttpStatus.BAD_REQUEST.value())));
@@ -105,9 +107,9 @@ class BarberShopControllerTest {
         var json = mapper.writeValueAsString(barberShopRequest);
 
         mockMvc.perform(put("/barberShop")
-                        .param("barberShopId", barberShopId.toString())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json))
+                .param("barberShopId", barberShopId.toString())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
                 .andExpect(status().isAccepted());
 
         verify(service).update(barberShop, barberShopId);
@@ -125,9 +127,9 @@ class BarberShopControllerTest {
         var requestJson = mapper.writeValueAsString(barberShopRequest);
 
         mockMvc.perform(put("/barberShop")
-                        .param("barberShopId", barberShopId.toString())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestJson))
+                .param("barberShopId", barberShopId.toString())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestJson))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message", is(errors)))
                 .andExpect(jsonPath("$.status", is(HttpStatus.BAD_REQUEST.value())));
@@ -171,9 +173,76 @@ class BarberShopControllerTest {
         when(service.listAll(PageRequest.of(0, 20))).thenReturn(new PageImpl<>(singletonList(barberShop)));
 
         mockMvc.perform(
-                        MockMvcRequestBuilders.get("/barberShop")
-                                .accept(MediaType.APPLICATION_JSON))
+                MockMvcRequestBuilders.get("/barberShop")
+                        .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void shouldReturnCreatedWhenPostAValidRequestForImage() throws Exception {
+        var barberShopId = UUID.randomUUID();
+
+        var uri = URI.create("https://www.teste.com/");
+
+        var multipartFile = new MockMultipartFile("image",
+                "hello.png",
+                MediaType.IMAGE_PNG_VALUE,
+                "Hello, World!".getBytes());
+
+        when(service.saveImages(barberShopId, multipartFile)).thenReturn(uri);
+
+        mockMvc.perform(
+                multipart("/barberShop/image")
+                        .file(multipartFile)
+                        .param("barberShopId", barberShopId.toString())
+                        .contentType(MediaType.MULTIPART_FORM_DATA))
+                .andExpect(status().isCreated());
+
+    }
+
+    @Test
+    void shouldReturnCreatedWhenPostValidRequestForLogo() throws Exception {
+        var barberShopId = UUID.randomUUID();
+
+        var uri = URI.create("https://www.teste.com/");
+
+        var multipartFile = new MockMultipartFile("logo",
+                "hello.png",
+                MediaType.IMAGE_PNG_VALUE,
+                "Hello, World!".getBytes());
+
+        when(service.saveLogo(barberShopId, multipartFile)).thenReturn(uri);
+
+        mockMvc.perform(
+                multipart("/barberShop/logo")
+                        .file(multipartFile)
+                        .param("barberShopId", barberShopId.toString())
+                        .contentType(MediaType.MULTIPART_FORM_DATA))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    void shouldReturnOKWhenDeleteValidRequestForImage() throws Exception {
+        var barberShopId = UUID.randomUUID();
+        var imageID = UUID.randomUUID();
+
+        mockMvc.perform(
+                delete("/barberShop/image")
+                        .param("barberShopId", barberShopId.toString())
+                        .param("imageId", imageID.toString())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void shouldReturnOKWhenDeleteValidRequestForLogo() throws Exception {
+        var barberShopId = UUID.randomUUID();
+
+        mockMvc.perform(
+                delete("/barberShop/logo")
+                        .param("barberShopId", barberShopId.toString())
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 }

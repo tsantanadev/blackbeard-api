@@ -26,10 +26,7 @@ public class ImageService {
         if (listImages.size() >= LIMITED_IMAGE) {
             throw new FileException("limit of images exceeded");
         }
-        var image = Image.builder()
-                .id(UUID.randomUUID())
-                .barberShop(barberShop)
-                .build();
+        var image = createdImage(barberShop);
 
         var uriImage = s3Service.uploadFile(multipartFile, image.getId().toString(), "image");
         image.setUrl(uriImage.toString());
@@ -49,6 +46,14 @@ public class ImageService {
     public Image findById(UUID id) {
         return repository.findById(id)
                 .orElseThrow(ObjectNotFoundException::new);
+    }
+
+    public Image createdImage(BarberShop barberShop) {
+        return Image.builder()
+                .id(UUID.randomUUID())
+                .barberShop(barberShop)
+                .build();
+
     }
 
 }

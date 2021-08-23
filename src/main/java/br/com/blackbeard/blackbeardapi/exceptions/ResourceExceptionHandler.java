@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Calendar;
@@ -80,6 +81,19 @@ public class ResourceExceptionHandler {
                 new StandardError<>(
                         HttpStatus.BAD_REQUEST.value(),
                         "Error amazon s3",
+                        e.getMessage(),
+                        System.currentTimeMillis(),
+                        request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST.value()).body(exception);
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<StandardError<String>> upload(
+            MaxUploadSizeExceededException e, HttpServletRequest request) {
+        StandardError<String> exception =
+                new StandardError<>(
+                        HttpStatus.BAD_REQUEST.value(),
+                        "Error",
                         e.getMessage(),
                         System.currentTimeMillis(),
                         request.getRequestURI());
