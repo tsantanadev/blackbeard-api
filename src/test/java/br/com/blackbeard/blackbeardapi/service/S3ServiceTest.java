@@ -19,8 +19,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class S3ServiceTest {
@@ -38,7 +37,7 @@ class S3ServiceTest {
     void shouldCreatedURIWhenSaveFile() throws Exception {
         var uri = URI.create("https://www.teste.com/");
 
-        var file = new File("src/test/images/teste.png");
+        var file = new File("src/test/java/br/com/blackbeard/blackbeardapi/resources/teste.png");
         var input = new FileInputStream(file);
         var multipartFile = new MockMultipartFile("file",
                 file.getName(), "text/plain", IOUtils.toByteArray(input));
@@ -49,7 +48,7 @@ class S3ServiceTest {
 
         when(s3.getUrl(bucket, barberShop.getId().toString())).thenReturn(uri.toURL());
 
-        var uriImage = s3Service.uploadFile(multipartFile, barberShop.getId().toString(), "logo");
+        var uriImage = s3Service.uploadFile(multipartFile, barberShop.getId().toString());
 
         assertThat(uriImage).isEqualTo(uri);
     }
@@ -60,20 +59,20 @@ class S3ServiceTest {
 
         s3Service.deleteFile(id);
 
-        verify(s3).deleteObject(bucket, id.toString());
+        verify(s3, times(1)).deleteObject(bucket, id.toString());
     }
 
     @Test
     void shouldThrowExceptionWhenSaveAFileThatIsNotJpgOrPng() throws Exception {
-        var file = new File("src/test/images/teste.pdf");
+        var file = new File("src/test/java/br/com/blackbeard/blackbeardapi/resources/teste.pdf");
         var input = new FileInputStream(file);
         var multipartFile = new MockMultipartFile("file",
                 file.getName(), "text/plain", IOUtils.toByteArray(input));
 
         var exception = assertThrows(FileException.class,
-                () -> s3Service.uploadFile(multipartFile, "", "logo"));
+                () -> s3Service.uploadFile(multipartFile, ""));
 
-        assertThat(exception).hasMessage("only accept images PNG and JPG");
+        assertThat(exception).hasMessage("The image format must be PNG or JPG");
     }
 
 }

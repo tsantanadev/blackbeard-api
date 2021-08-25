@@ -1,5 +1,6 @@
 package br.com.blackbeard.blackbeardapi.service;
 
+import br.com.blackbeard.blackbeardapi.exceptions.BarberShopImageLimitException;
 import br.com.blackbeard.blackbeardapi.exceptions.FileException;
 import br.com.blackbeard.blackbeardapi.exceptions.ObjectNotFoundException;
 import br.com.blackbeard.blackbeardapi.models.BarberShop;
@@ -13,7 +14,8 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 
 import java.net.URI;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -33,7 +35,10 @@ class ImageServiceTest {
     private ImageRepository repository;
 
     @Mock
-    private S3Service s3Service;
+    private BarberShopService barberShopService;
+
+    @Mock
+    private ImageStorageService imageStorageService;
 
     @Captor
     ArgumentCaptor<Image> imageCaptor;
@@ -59,11 +64,13 @@ class ImageServiceTest {
         when(repository.findAllByBarberShopId(barberShop.getId()))
                 .thenReturn(singletonList(image));
 
-        when(service.createdImage(barberShop)).thenReturn(image);
+        when(barberShopService.findById(barberShop.getId())).thenReturn(barberShop);
 
-        when(s3Service.uploadFile(multipartFile, image.getId().toString(), "image")).thenReturn(uri);
+        when(service.createImage(barberShop)).thenReturn(image);
 
-        var imageURI = service.saveImages(barberShop, multipartFile);
+        when(imageStorageService.uploadFile(multipartFile, image.getId().toString())).thenReturn(uri);
+
+        var imageURI = service.saveImage(barberShop.getId(), multipartFile);
 
         verify(repository, times(1)).save(imageCaptor.capture());
 
@@ -109,9 +116,10 @@ class ImageServiceTest {
                 .id(UUID.randomUUID())
                 .build();
 
-        var image = service.createdImage(barberShop);
+        var image = service.createImage(barberShop);
 
         assertThat(image.getId()).isNotNull();
+        assertThat(image.getBarberShop()).isEqualTo(barberShop);
     }
 
     @Test
@@ -127,16 +135,20 @@ class ImageServiceTest {
                 .barberShop(barberShop)
                 .build();
 
+        when(barberShopService.findById(barberShop.getId())).thenReturn(barberShop);
         when(repository.findById(imageId)).thenReturn(Optional.of(image));
 
-        service.deleteImage(barberShop, imageId);
 
-        verify(s3Service, times(1)).deleteFile(image.getId());
+        service.deleteImage(barberShop.getId(), imageId);
+
+        verify(imageStorageService, times(1)).deleteFile(image.getId());
         verify(repository, times(1)).delete(image);
     }
 
     @Test
     void shouldThrowExceptionWhenDeleteAImage() {
+        var barberShopID = UUID.randomUUID();
+
         var barberShop = BarberShop.builder()
                 .id(UUID.randomUUID())
                 .build();
@@ -150,10 +162,11 @@ class ImageServiceTest {
                         .build())
                 .build();
 
+        when(barberShopService.findById(barberShopID)).thenReturn(barberShop);
         when(repository.findById(imageId)).thenReturn(Optional.of(image));
 
         var exception = assertThrows(FileException.class,
-                () -> service.deleteImage(barberShop, imageId));
+                () -> service.deleteImage(barberShopID, imageId));
 
 
         assertThat(exception).hasMessage("image does not belong to this barbershop");
@@ -166,8 +179,10 @@ class ImageServiceTest {
                 MediaType.IMAGE_PNG_VALUE,
                 "Hello, World!".getBytes());
 
+        var barberShopID = UUID.randomUUID();
+
         var barberShop = BarberShop.builder()
-                .id(UUID.randomUUID())
+                .id(barberShopID)
                 .build();
 
         var image = Image.builder()
@@ -175,41 +190,21 @@ class ImageServiceTest {
                 .barberShop(barberShop)
                 .build();
 
-        var image2 = Image.builder()
-                .id(UUID.randomUUID())
-                .barberShop(barberShop)
-                .build();
+        List<Image> listImage = new ArrayList<>();
 
-        var image3 = Image.builder()
-                .id(UUID.randomUUID())
-                .barberShop(barberShop)
-                .build();
+        for (int i = 0; i <= 5; i++) {
+            listImage.add(image);
+        }
 
-        var image4 = Image.builder()
-                .id(UUID.randomUUID())
-                .barberShop(barberShop)
-                .build();
-
-        var image5 = Image.builder()
-                .id(UUID.randomUUID())
-                .barberShop(barberShop)
-                .build();
-
-        var image6 = Image.builder()
-                .id(UUID.randomUUID())
-                .barberShop(barberShop)
-                .build();
-
+        when(barberShopService.findById(barberShopID)).thenReturn(barberShop);
         when(repository.findAllByBarberShopId(barberShop.getId()))
-                .thenReturn(Arrays.asList(image, image2, image3, image4, image5, image6));
+                .thenReturn(listImage);
 
-        var exception = assertThrows(FileException.class,
-                () -> service.saveImages(barberShop, multipartFile));
-
+        var exception = assertThrows(BarberShopImageLimitException.class,
+                () -> service.saveImage(barberShopID, multipartFile));
 
         assertThat(exception).hasMessage("limit of images exceeded");
     }
-
 
 }
 

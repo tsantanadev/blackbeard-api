@@ -100,4 +100,17 @@ public class ResourceExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST.value()).body(exception);
     }
 
+    @ExceptionHandler(BarberShopImageLimitException.class)
+    public ResponseEntity<StandardError<String>> limit(
+            BarberShopImageLimitException e, HttpServletRequest request) {
+        StandardError<String> exception =
+                new StandardError<>(
+                        HttpStatus.BAD_REQUEST.value(),
+                        "error image",
+                        e.getMessage(),
+                        System.currentTimeMillis(),
+                        request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST.value()).body(exception);
+    }
+
 }

@@ -2,6 +2,7 @@ package br.com.blackbeard.blackbeardapi.controllers;
 
 import br.com.blackbeard.blackbeardapi.dtos.barbershop.BarberShopRequest;
 import br.com.blackbeard.blackbeardapi.dtos.barbershop.BarberShopResponse;
+import br.com.blackbeard.blackbeardapi.exceptions.FileException;
 import br.com.blackbeard.blackbeardapi.exceptions.ObjectNotFoundException;
 import br.com.blackbeard.blackbeardapi.models.BarberShop;
 import br.com.blackbeard.blackbeardapi.service.BarberShopService;
@@ -17,9 +18,9 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.UUID;
 
@@ -180,28 +181,6 @@ class BarberShopControllerTest {
     }
 
     @Test
-    void shouldReturnCreatedWhenPostAValidRequestForImage() throws Exception {
-        var barberShopId = UUID.randomUUID();
-
-        var uri = URI.create("https://www.teste.com/");
-
-        var multipartFile = new MockMultipartFile("image",
-                "hello.png",
-                MediaType.IMAGE_PNG_VALUE,
-                "Hello, World!".getBytes());
-
-        when(service.saveImages(barberShopId, multipartFile)).thenReturn(uri);
-
-        mockMvc.perform(
-                multipart("/barberShop/image")
-                        .file(multipartFile)
-                        .param("barberShopId", barberShopId.toString())
-                        .contentType(MediaType.MULTIPART_FORM_DATA))
-                .andExpect(status().isCreated());
-
-    }
-
-    @Test
     void shouldReturnCreatedWhenPostValidRequestForLogo() throws Exception {
         var barberShopId = UUID.randomUUID();
 
@@ -222,18 +201,6 @@ class BarberShopControllerTest {
                 .andExpect(status().isCreated());
     }
 
-    @Test
-    void shouldReturnOKWhenDeleteValidRequestForImage() throws Exception {
-        var barberShopId = UUID.randomUUID();
-        var imageID = UUID.randomUUID();
-
-        mockMvc.perform(
-                delete("/barberShop/image")
-                        .param("barberShopId", barberShopId.toString())
-                        .param("imageId", imageID.toString())
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-    }
 
     @Test
     void shouldReturnOKWhenDeleteValidRequestForLogo() throws Exception {
@@ -244,5 +211,49 @@ class BarberShopControllerTest {
                         .param("barberShopId", barberShopId.toString())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    void shouldReturnBadRequestWhenPostImageFormatInvalid() throws Exception {
+        var barberShopId = UUID.randomUUID();
+
+        var multipartFile = new MockMultipartFile("logo",
+                "hello.png",
+                MediaType.IMAGE_PNG_VALUE,
+                "Hello, World!".getBytes());
+
+        var errors = "error of archive";
+
+        when(service.saveLogo(barberShopId, multipartFile)).thenThrow(FileException.class);
+
+        mockMvc.perform(
+                multipart("/barberShop/logo")
+                        .file(multipartFile)
+                        .param("barberShopId", barberShopId.toString())
+                        .contentType(MediaType.MULTIPART_FORM_DATA))
+                .andExpect(jsonPath("$.message", is(errors)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void shouldReturnBadRequestWhenPostImageMaxUpload() throws Exception {
+        var barberShopId = UUID.randomUUID();
+
+        var multipartFile = new MockMultipartFile("logo",
+                "hello.png",
+                MediaType.IMAGE_PNG_VALUE,
+                "Hello, World!".getBytes());
+
+        var errors = "Error";
+
+        when(service.saveLogo(barberShopId, multipartFile)).thenThrow(MaxUploadSizeExceededException.class);
+
+        mockMvc.perform(
+                multipart("/barberShop/logo")
+                        .file(multipartFile)
+                        .param("barberShopId", barberShopId.toString())
+                        .contentType(MediaType.MULTIPART_FORM_DATA))
+                .andExpect(jsonPath("$.message", is(errors)))
+                .andExpect(status().isBadRequest());
     }
 }

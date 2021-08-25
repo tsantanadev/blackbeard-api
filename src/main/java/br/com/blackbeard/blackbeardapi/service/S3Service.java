@@ -20,7 +20,9 @@ import java.net.URISyntaxException;
 import java.util.UUID;
 
 @Service
-public class S3Service {
+public class S3Service implements ImageStorageService {
+
+    public static final String CONTENT_TYPE = "image";
 
     @Autowired
     private AmazonS3 s3;
@@ -28,15 +30,15 @@ public class S3Service {
     @Value("${s3.bucket}")
     private String bucket;
 
-    public URI uploadFile(MultipartFile multipartFile, String fileName, String contentType) {
+    public URI uploadFile(MultipartFile multipartFile, String fileName) {
         var meta = new ObjectMetadata();
-        meta.setContentType(contentType);
-        var inputStream = getPNGImageFromFile(multipartFile);
+        meta.setContentType(CONTENT_TYPE);
+        var inputStream = getImageFromFile(multipartFile);
         s3.putObject(bucket, fileName, inputStream, meta);
         try {
             return s3.getUrl(bucket, fileName).toURI();
         } catch (URISyntaxException e) {
-            throw new FileException("fail to convert URL to URI");
+            throw FileException.errorToGetImageURI();
         }
     }
 
@@ -44,17 +46,17 @@ public class S3Service {
         s3.deleteObject(bucket, id.toString());
     }
 
-    private InputStream getPNGImageFromFile(MultipartFile multipartFile) {
+    private InputStream getImageFromFile(MultipartFile multipartFile) {
         var extension = FilenameUtils.getExtension(multipartFile.getOriginalFilename());
         if (!"png".equalsIgnoreCase(extension) && !"jpg".equalsIgnoreCase(extension)) {
-            throw new FileException("only accept images PNG and JPG");
+            throw FileException.invalidImageFormat();
         }
         try {
             var image = ImageIO.read(multipartFile.getInputStream());
             return getInputStream(image);
 
         } catch (IOException e) {
-            throw new FileException("error to read archive");
+            throw FileException.errorToReadFile();
         }
     }
 
@@ -64,7 +66,7 @@ public class S3Service {
             ImageIO.write(img, "png", os);
             return new ByteArrayInputStream(os.toByteArray());
         } catch (IOException e) {
-            throw new FileException("error to read archive");
+            throw FileException.errorToReadFile();
         }
     }
 }

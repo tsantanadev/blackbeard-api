@@ -22,8 +22,7 @@ import static java.util.Objects.nonNull;
 public class BarberShopService {
 
     private final BarberShopRepository repository;
-    private final ImageService imageService;
-    private final S3Service s3Service;
+    private final ImageStorageService imageStorageService;
 
     @Transactional
     public BarberShop save(BarberShop barberShop) {
@@ -61,7 +60,7 @@ public class BarberShopService {
 
     public URI saveLogo(UUID barberShopId, MultipartFile multipartFile) {
         var barberShop = findById(barberShopId);
-        var uriLogo = s3Service.uploadFile(multipartFile, barberShop.getId().toString(), "logo");
+        var uriLogo = imageStorageService.uploadFile(multipartFile, barberShop.getId().toString());
         barberShop.setUrlLogo(uriLogo.toString());
         repository.save(barberShop);
         return uriLogo;
@@ -69,18 +68,8 @@ public class BarberShopService {
 
     public void deleteLogo(UUID barberShopId) {
         var barberShop = findById(barberShopId);
-        s3Service.deleteFile(barberShop.getId());
+        imageStorageService.deleteFile(barberShop.getId());
         barberShop.setUrlLogo(null);
         repository.save(barberShop);
-    }
-
-    public URI saveImages(UUID barberShopId, MultipartFile multipartFile) {
-        var barberShop = findById(barberShopId);
-        return imageService.saveImages(barberShop, multipartFile);
-    }
-
-    public void deleteImage(UUID barberShopId, UUID imageId) {
-        var barberShop = findById(barberShopId);
-        imageService.deleteImage(barberShop, imageId);
     }
 }

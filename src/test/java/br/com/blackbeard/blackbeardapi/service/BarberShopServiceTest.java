@@ -35,9 +35,6 @@ class BarberShopServiceTest {
     private BarberShopRepository repository;
 
     @Mock
-    private ImageService imageService;
-
-    @Mock
     private S3Service s3Service;
 
     @Captor
@@ -201,7 +198,7 @@ class BarberShopServiceTest {
                 "text/plain", "Spring Framework".getBytes());
 
         when(repository.findById(barberShopId)).thenReturn(Optional.of(barberShop));
-        when(s3Service.uploadFile(multipartFile, barberShop.getId().toString(), "logo"))
+        when(s3Service.uploadFile(multipartFile, barberShop.getId().toString()))
                 .thenReturn(uri);
 
         service.saveLogo(barberShopId, multipartFile);
@@ -209,29 +206,6 @@ class BarberShopServiceTest {
         verify(repository).save(barberShopCaptor.capture());
 
         assertThat(barberShopCaptor.getValue().getUrlLogo()).isEqualTo(uri.toString());
-
-    }
-
-    @Test
-    void shouldSaveAnImage() {
-        var barberShopId = UUID.randomUUID();
-
-        var barberShop = BarberShop.builder()
-                .id(barberShopId)
-                .build();
-
-        var uri = URI.create("https://www.teste.com/");
-
-        var multipartFile = new MockMultipartFile("file", "test.png",
-                "text/plain", "Spring Framework".getBytes());
-
-        when(repository.findById(barberShopId)).thenReturn(Optional.of(barberShop));
-        when(imageService.saveImages(barberShop, multipartFile)).thenReturn(uri);
-
-        var uriImage = service.saveImages(barberShopId, multipartFile);
-
-        verify(imageService, times(1)).saveImages(barberShop, multipartFile);
-        assertThat(uriImage).isEqualTo(uri);
 
     }
 
@@ -255,22 +229,5 @@ class BarberShopServiceTest {
         verify(s3Service, times(1)).deleteFile(barberShopId);
 
         assertThat(barberShopCaptor.getValue().getUrlLogo()).isNull();
-    }
-
-    @Test
-    void shouldDeleteAnImageBarberShop() {
-        var barberShopId = UUID.randomUUID();
-
-        var imageId = UUID.randomUUID();
-
-        var barberShop = BarberShop.builder()
-                .id(barberShopId)
-                .build();
-
-        when(repository.findById(barberShopId)).thenReturn(Optional.of(barberShop));
-
-        service.deleteImage(barberShopId, imageId);
-
-        verify(imageService, times(1)).deleteImage(barberShop, imageId);
     }
 }

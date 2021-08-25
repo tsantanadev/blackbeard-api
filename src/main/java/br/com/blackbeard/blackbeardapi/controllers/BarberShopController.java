@@ -64,18 +64,4 @@ public class BarberShopController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/image")
-    public ResponseEntity<Void> saveImage(@RequestParam("barberShopId") UUID barberShopId,
-                                          @RequestParam("image") MultipartFile multipartFile) {
-        var uri = service.saveImages(barberShopId, multipartFile);
-        return ResponseEntity.created(uri).build();
-    }
-
-    @DeleteMapping("/image")
-    public ResponseEntity<Void> deleteImage(@RequestParam("barberShopId") UUID barberShopId,
-                                            @RequestParam("imageId") UUID imageId) {
-        service.deleteImage(barberShopId, imageId);
-        return ResponseEntity.ok().build();
-    }
-
 }

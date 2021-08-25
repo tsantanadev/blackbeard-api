@@ -1,5 +1,6 @@
 package br.com.blackbeard.blackbeardapi.service;
 
+import br.com.blackbeard.blackbeardapi.exceptions.BarberShopImageLimitException;
 import br.com.blackbeard.blackbeardapi.exceptions.FileException;
 import br.com.blackbeard.blackbeardapi.exceptions.ObjectNotFoundException;
 import br.com.blackbeard.blackbeardapi.models.BarberShop;
@@ -16,30 +17,34 @@ import java.util.UUID;
 @AllArgsConstructor
 public class ImageService {
 
-    private static final Integer LIMITED_IMAGE = 5;
+    private static final Integer IMAGE_LIMIT = 5;
+    public static final String IMAGE_DOES_NOT_THIS_BARBERSHOP = "image does not belong to this barbershop";
 
     private final ImageRepository repository;
-    private final S3Service s3Service;
+    private final ImageStorageService imageStorageService;
+    private final BarberShopService barberShopService;
 
-    public URI saveImages(BarberShop barberShop, MultipartFile multipartFile) {
+    public URI saveImage(UUID barberShopId, MultipartFile multipartFile) {
+        var barberShop = barberShopService.findById(barberShopId);
         var listImages = repository.findAllByBarberShopId(barberShop.getId());
-        if (listImages.size() >= LIMITED_IMAGE) {
-            throw new FileException("limit of images exceeded");
+        if (listImages.size() >= IMAGE_LIMIT) {
+            throw new BarberShopImageLimitException();
         }
-        var image = createdImage(barberShop);
+        var image = createImage(barberShop);
 
-        var uriImage = s3Service.uploadFile(multipartFile, image.getId().toString(), "image");
+        var uriImage = imageStorageService.uploadFile(multipartFile, image.getId().toString());
         image.setUrl(uriImage.toString());
         repository.save(image);
         return uriImage;
     }
 
-    public void deleteImage(BarberShop barberShop, UUID imageId) {
+    public void deleteImage(UUID barberShopId, UUID imageId) {
+        var barberShop = barberShopService.findById(barberShopId);
         var image = findById(imageId);
         if (!image.getBarberShop().getId().equals(barberShop.getId())) {
-            throw new FileException("image does not belong to this barbershop");
+            throw new FileException(IMAGE_DOES_NOT_THIS_BARBERSHOP);
         }
-        s3Service.deleteFile(image.getId());
+        imageStorageService.deleteFile(image.getId());
         repository.delete(image);
     }
 
@@ -48,12 +53,10 @@ public class ImageService {
                 .orElseThrow(ObjectNotFoundException::new);
     }
 
-    public Image createdImage(BarberShop barberShop) {
+    public Image createImage(BarberShop barberShop) {
         return Image.builder()
                 .id(UUID.randomUUID())
                 .barberShop(barberShop)
                 .build();
-
     }
-
 }
