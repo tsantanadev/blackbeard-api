@@ -3,6 +3,9 @@ package br.com.blackbeard.blackbeardapi.controllers;
 import br.com.blackbeard.blackbeardapi.exceptions.BarberShopImageLimitException;
 import br.com.blackbeard.blackbeardapi.exceptions.FileException;
 import br.com.blackbeard.blackbeardapi.service.ImageService;
+import com.amazonaws.AmazonClientException;
+import com.amazonaws.AmazonServiceException;
+import com.amazonaws.services.s3.model.AmazonS3Exception;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -122,6 +125,94 @@ class ImageControllerTest {
         var errors = "error image";
 
         when(service.saveImage(barberShopId, multipartFile)).thenThrow(BarberShopImageLimitException.class);
+
+        mockMvc.perform(
+                multipart("/barberShop/image")
+                        .file(multipartFile)
+                        .param("barberShopId", barberShopId.toString())
+                        .contentType(MediaType.MULTIPART_FORM_DATA))
+                .andExpect(jsonPath("$.message", is(errors)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void shouldReturnBadRequestAmazonS3ExceptionWhenPostImage() throws Exception {
+        var barberShopId = UUID.randomUUID();
+
+        var multipartFile = new MockMultipartFile("image",
+                "hello.png",
+                MediaType.IMAGE_PNG_VALUE,
+                "Hello, World!".getBytes());
+
+        var errors = "Error amazon s3";
+
+        when(service.saveImage(barberShopId, multipartFile)).thenThrow(AmazonS3Exception.class);
+
+        mockMvc.perform(
+                multipart("/barberShop/image")
+                        .file(multipartFile)
+                        .param("barberShopId", barberShopId.toString())
+                        .contentType(MediaType.MULTIPART_FORM_DATA))
+                .andExpect(jsonPath("$.message", is(errors)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void shouldReturnBadRequestAmazonClientExceptionWhenPostImage() throws Exception {
+        var barberShopId = UUID.randomUUID();
+
+        var multipartFile = new MockMultipartFile("image",
+                "hello.png",
+                MediaType.IMAGE_PNG_VALUE,
+                "Hello, World!".getBytes());
+
+        var errors = "Error amazon client";
+
+        when(service.saveImage(barberShopId, multipartFile)).thenThrow(AmazonClientException.class);
+
+        mockMvc.perform(
+                multipart("/barberShop/image")
+                        .file(multipartFile)
+                        .param("barberShopId", barberShopId.toString())
+                        .contentType(MediaType.MULTIPART_FORM_DATA))
+                .andExpect(jsonPath("$.message", is(errors)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void shouldReturnBadRequestAmazonServiceExceptionWhenPostImage() throws Exception {
+        var barberShopId = UUID.randomUUID();
+
+        var multipartFile = new MockMultipartFile("image",
+                "hello.png",
+                MediaType.IMAGE_PNG_VALUE,
+                "Hello, World!".getBytes());
+
+        var errors = "Error amazon service";
+
+        when(service.saveImage(barberShopId, multipartFile)).thenThrow(AmazonServiceException.class);
+
+        mockMvc.perform(
+                multipart("/barberShop/image")
+                        .file(multipartFile)
+                        .param("barberShopId", barberShopId.toString())
+                        .contentType(MediaType.MULTIPART_FORM_DATA))
+                .andExpect(jsonPath("$.message", is(errors)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void shouldReturnBadRequestFileExceptionWhenPostImage() throws Exception {
+        var barberShopId = UUID.randomUUID();
+
+        var multipartFile = new MockMultipartFile("image",
+                "hello.png",
+                MediaType.IMAGE_PNG_VALUE,
+                "Hello, World!".getBytes());
+
+        var errors = "error of archive";
+
+        when(service.saveImage(barberShopId, multipartFile)).thenThrow(FileException.class);
 
         mockMvc.perform(
                 multipart("/barberShop/image")

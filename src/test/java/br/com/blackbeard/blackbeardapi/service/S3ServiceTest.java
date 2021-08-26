@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mock.web.MockMultipartFile;
@@ -24,6 +25,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class S3ServiceTest {
 
+    @Spy
     @InjectMocks
     private S3Service s3Service;
 
@@ -75,4 +77,18 @@ class S3ServiceTest {
         assertThat(exception).hasMessage("The image format must be PNG or JPG");
     }
 
+    @Test
+    void shouldThrowExceptionWhenGetURI() throws Exception {
+        var file = new File("src/test/java/br/com/blackbeard/blackbeardapi/resources/teste.png");
+        var input = new FileInputStream(file);
+        var multipartFile = new MockMultipartFile("file",
+                file.getName(), "text/plain", IOUtils.toByteArray(input));
+
+        when(s3.getUrl(bucket, "")).thenThrow(FileException.errorToGetImageURI());
+
+        var exception = assertThrows(FileException.class,
+                () -> s3Service.uploadFile(multipartFile, ""));
+
+        assertThat(exception).hasMessage("fail to convert URL to URI");
+    }
 }

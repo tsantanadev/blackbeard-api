@@ -50,15 +50,14 @@ public class ResourceExceptionHandler {
     @ExceptionHandler(AmazonServiceException.class)
     public ResponseEntity<StandardError<String>> amazonService(
             AmazonServiceException e, HttpServletRequest request) {
-        HttpStatus code = HttpStatus.valueOf(e.getErrorCode());
         var exception =
                 new StandardError<>(
-                        code.value(),
+                        HttpStatus.BAD_REQUEST.value(),
                         "Error amazon service",
                         e.getMessage(),
                         System.currentTimeMillis(),
                         request.getRequestURI());
-        return ResponseEntity.status(code.value()).body(exception);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST.value()).body(exception);
     }
 
     @ExceptionHandler(AmazonClientException.class)
