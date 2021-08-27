@@ -41,7 +41,7 @@ public class ImageService {
         var barberShop = barberShopService.findById(barberShopId);
         var image = findById(imageId);
         if (!image.getBarberShop().getId().equals(barberShop.getId())) {
-            throw BarberShopImageException.imageDoesNotBarberShop();
+            throw BarberShopImageException.imageDoesNotBelongToBarberShop();
         }
         imageStorageService.deleteFile(image.getId());
         repository.delete(image);

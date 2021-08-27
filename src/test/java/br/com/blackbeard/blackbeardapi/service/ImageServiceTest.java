@@ -169,7 +169,7 @@ class ImageServiceTest {
                 () -> service.deleteImage(barberShopID, imageId));
 
 
-        assertThat(exception).hasMessage("image does not belong to this barbershop");
+        assertThat(exception).hasMessage("image does not belong to BarberShop");
     }
 
     @Test
