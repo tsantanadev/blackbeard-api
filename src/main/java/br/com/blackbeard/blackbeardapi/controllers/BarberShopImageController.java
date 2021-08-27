@@ -9,20 +9,20 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/barberShop")
-public class ImageController {
+@RequestMapping("/barberShop/image")
+public class BarberShopImageController {
 
     @Autowired
     private ImageService service;
 
-    @PostMapping("/image")
+    @PostMapping
     public ResponseEntity<Void> saveImage(@RequestParam("barberShopId") UUID barberShopId,
                                           @RequestParam("image") MultipartFile multipartFile) {
         var uri = service.saveImage(barberShopId, multipartFile);
         return ResponseEntity.created(uri).build();
     }
 
-    @DeleteMapping("/image")
+    @DeleteMapping
     public ResponseEntity<Void> deleteImage(@RequestParam("barberShopId") UUID barberShopId,
                                             @RequestParam("imageId") UUID imageId) {
         service.deleteImage(barberShopId, imageId);

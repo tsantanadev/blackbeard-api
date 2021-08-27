@@ -18,6 +18,12 @@ import java.util.Map;
 @ControllerAdvice
 public class ResourceExceptionHandler {
 
+    public static final String VALIDATION_ERROR = "Validation error";
+    public static final String ERROR_OF_ARCHIVE = "error of archive";
+    public static final String STORAGE_ERROR = "Storage error";
+    public static final String IMAGE_SIZE_EXCEEDED = "Image size exceeded";
+    public static final String BARBER_SHOP_IMAGE_ERROR = "Barber shop image error";
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<StandardError<Map<String, String>>> validation(
             MethodArgumentNotValidException e, HttpServletRequest request) {
@@ -30,7 +36,7 @@ public class ResourceExceptionHandler {
         return ResponseEntity.badRequest().body(new StandardError<>(
                 HttpStatus.BAD_REQUEST.value(),
                 errors,
-                "Validation error",
+                VALIDATION_ERROR,
                 Calendar.getInstance().getTimeInMillis(),
                 request.getRequestURI()));
     }
@@ -40,46 +46,20 @@ public class ResourceExceptionHandler {
             FileException e, HttpServletRequest request) {
         var exception = new StandardError<>(
                 HttpStatus.BAD_REQUEST.value(),
-                "error of archive",
+                ERROR_OF_ARCHIVE,
                 e.getMessage(),
                 System.currentTimeMillis(),
                 request.getRequestURI());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception);
     }
 
-    @ExceptionHandler(AmazonServiceException.class)
+    @ExceptionHandler({AmazonServiceException.class, AmazonClientException.class, AmazonS3Exception.class})
     public ResponseEntity<StandardError<String>> amazonService(
-            AmazonServiceException e, HttpServletRequest request) {
-        var exception =
-                new StandardError<>(
-                        HttpStatus.BAD_REQUEST.value(),
-                        "Error amazon service",
-                        e.getMessage(),
-                        System.currentTimeMillis(),
-                        request.getRequestURI());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST.value()).body(exception);
-    }
-
-    @ExceptionHandler(AmazonClientException.class)
-    public ResponseEntity<StandardError<String>> amazonClient(
             AmazonClientException e, HttpServletRequest request) {
         var exception =
                 new StandardError<>(
                         HttpStatus.BAD_REQUEST.value(),
-                        "Error amazon client",
-                        e.getMessage(),
-                        System.currentTimeMillis(),
-                        request.getRequestURI());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST.value()).body(exception);
-    }
-
-    @ExceptionHandler(AmazonS3Exception.class)
-    public ResponseEntity<StandardError<String>> amazonS3(
-            AmazonS3Exception e, HttpServletRequest request) {
-        var exception =
-                new StandardError<>(
-                        HttpStatus.BAD_REQUEST.value(),
-                        "Error amazon s3",
+                        STORAGE_ERROR,
                         e.getMessage(),
                         System.currentTimeMillis(),
                         request.getRequestURI());
@@ -87,12 +67,12 @@ public class ResourceExceptionHandler {
     }
 
     @ExceptionHandler(MaxUploadSizeExceededException.class)
-    public ResponseEntity<StandardError<String>> upload(
+    public ResponseEntity<StandardError<String>> maxUploadSizeExceededExceptionHandler(
             MaxUploadSizeExceededException e, HttpServletRequest request) {
-        StandardError<String> exception =
+        var exception =
                 new StandardError<>(
                         HttpStatus.BAD_REQUEST.value(),
-                        "Error",
+                        IMAGE_SIZE_EXCEEDED,
                         e.getMessage(),
                         System.currentTimeMillis(),
                         request.getRequestURI());
@@ -100,12 +80,12 @@ public class ResourceExceptionHandler {
     }
 
     @ExceptionHandler(BarberShopImageLimitException.class)
-    public ResponseEntity<StandardError<String>> limit(
+    public ResponseEntity<StandardError<String>> barberShopImageLimitExceptionHandler(
             BarberShopImageLimitException e, HttpServletRequest request) {
-        StandardError<String> exception =
+        var exception =
                 new StandardError<>(
                         HttpStatus.BAD_REQUEST.value(),
-                        "error image",
+                        BARBER_SHOP_IMAGE_ERROR,
                         e.getMessage(),
                         System.currentTimeMillis(),
                         request.getRequestURI());

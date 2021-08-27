@@ -1,7 +1,7 @@
 package br.com.blackbeard.blackbeardapi.service;
 
+import br.com.blackbeard.blackbeardapi.exceptions.BarberShopImageException;
 import br.com.blackbeard.blackbeardapi.exceptions.BarberShopImageLimitException;
-import br.com.blackbeard.blackbeardapi.exceptions.FileException;
 import br.com.blackbeard.blackbeardapi.exceptions.ObjectNotFoundException;
 import br.com.blackbeard.blackbeardapi.models.BarberShop;
 import br.com.blackbeard.blackbeardapi.models.Image;
@@ -165,7 +165,7 @@ class ImageServiceTest {
         when(barberShopService.findById(barberShopID)).thenReturn(barberShop);
         when(repository.findById(imageId)).thenReturn(Optional.of(image));
 
-        var exception = assertThrows(FileException.class,
+        var exception = assertThrows(BarberShopImageException.class,
                 () -> service.deleteImage(barberShopID, imageId));
 
 

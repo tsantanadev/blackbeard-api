@@ -1,7 +1,7 @@
 package br.com.blackbeard.blackbeardapi.service;
 
+import br.com.blackbeard.blackbeardapi.exceptions.BarberShopImageException;
 import br.com.blackbeard.blackbeardapi.exceptions.BarberShopImageLimitException;
-import br.com.blackbeard.blackbeardapi.exceptions.FileException;
 import br.com.blackbeard.blackbeardapi.exceptions.ObjectNotFoundException;
 import br.com.blackbeard.blackbeardapi.models.BarberShop;
 import br.com.blackbeard.blackbeardapi.models.Image;
@@ -18,7 +18,6 @@ import java.util.UUID;
 public class ImageService {
 
     private static final Integer IMAGE_LIMIT = 5;
-    public static final String IMAGE_DOES_NOT_THIS_BARBERSHOP = "image does not belong to this barbershop";
 
     private final ImageRepository repository;
     private final ImageStorageService imageStorageService;
@@ -42,7 +41,7 @@ public class ImageService {
         var barberShop = barberShopService.findById(barberShopId);
         var image = findById(imageId);
         if (!image.getBarberShop().getId().equals(barberShop.getId())) {
-            throw new FileException(IMAGE_DOES_NOT_THIS_BARBERSHOP);
+            throw new BarberShopImageException();
         }
         imageStorageService.deleteFile(image.getId());
         repository.delete(image);

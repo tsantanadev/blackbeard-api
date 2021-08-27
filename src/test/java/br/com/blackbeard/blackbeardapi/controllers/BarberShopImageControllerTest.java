@@ -25,8 +25,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(ImageController.class)
-class ImageControllerTest {
+@WebMvcTest(BarberShopImageController.class)
+class BarberShopImageControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -100,7 +100,7 @@ class ImageControllerTest {
                 MediaType.IMAGE_PNG_VALUE,
                 "Hello, World!".getBytes());
 
-        var errors = "Error";
+        var errors = "Image size exceeded";
 
         when(service.saveImage(barberShopId, multipartFile)).thenThrow(MaxUploadSizeExceededException.class);
 
@@ -122,7 +122,7 @@ class ImageControllerTest {
                 MediaType.IMAGE_PNG_VALUE,
                 "Hello, World!".getBytes());
 
-        var errors = "error image";
+        var errors = "Barber shop image error";
 
         when(service.saveImage(barberShopId, multipartFile)).thenThrow(BarberShopImageLimitException.class);
 
@@ -144,7 +144,7 @@ class ImageControllerTest {
                 MediaType.IMAGE_PNG_VALUE,
                 "Hello, World!".getBytes());
 
-        var errors = "Error amazon s3";
+        var errors = "Storage error";
 
         when(service.saveImage(barberShopId, multipartFile)).thenThrow(AmazonS3Exception.class);
 
@@ -166,7 +166,7 @@ class ImageControllerTest {
                 MediaType.IMAGE_PNG_VALUE,
                 "Hello, World!".getBytes());
 
-        var errors = "Error amazon client";
+        var errors = "Storage error";
 
         when(service.saveImage(barberShopId, multipartFile)).thenThrow(AmazonClientException.class);
 
@@ -188,7 +188,7 @@ class ImageControllerTest {
                 MediaType.IMAGE_PNG_VALUE,
                 "Hello, World!".getBytes());
 
-        var errors = "Error amazon service";
+        var errors = "Storage error";
 
         when(service.saveImage(barberShopId, multipartFile)).thenThrow(AmazonServiceException.class);
 
