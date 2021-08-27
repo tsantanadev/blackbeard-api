@@ -244,7 +244,7 @@ class BarberShopControllerTest {
                 MediaType.IMAGE_PNG_VALUE,
                 "Hello, World!".getBytes());
 
-        var errors = "Error";
+        var errors = "Image size exceeded";
 
         when(service.saveLogo(barberShopId, multipartFile)).thenThrow(MaxUploadSizeExceededException.class);
 
