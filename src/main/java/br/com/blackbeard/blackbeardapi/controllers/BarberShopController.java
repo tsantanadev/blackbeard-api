@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
@@ -49,4 +50,18 @@ public class BarberShopController {
     public ResponseEntity<BarberShopResponse> findById(@PathVariable UUID id) {
         return ResponseEntity.ok(BarberShopMapper.convertToResponse(service.findById(id)));
     }
+
+    @PostMapping("/logo")
+    public ResponseEntity<Void> saveLogo(@RequestParam("barberShopId") UUID barberShopId,
+                                         @RequestParam("logo") MultipartFile multipartFile) {
+        var uri = service.saveLogo(barberShopId, multipartFile);
+        return ResponseEntity.created(uri).build();
+    }
+
+    @DeleteMapping("/logo")
+    public ResponseEntity<Void> deleteLogo(@RequestParam("barberShopId") UUID barberShopId) {
+        service.deleteLogo(barberShopId);
+        return ResponseEntity.ok().build();
+    }
+
 }

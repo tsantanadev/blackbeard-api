@@ -16,6 +16,12 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     open-in-view: false
     generate-ddl: true
+
+  servlet:
+    multipart:
+      max-file-size: 500KB
+      max-request-size: 500KB
+
 # Logger configuration
 logging:
   pattern:
@@ -26,3 +32,12 @@ logging:
 # Server configuration
 server:
   port: 8080
+
+#AWS
+s3:
+  bucket: ${BUCKETNAME}
+  region: sa-east-1
+
+aws:
+  access_key_id: ${ACCESSKEYID}
+  secret_access_key: ${SECRETACCESSKEY}

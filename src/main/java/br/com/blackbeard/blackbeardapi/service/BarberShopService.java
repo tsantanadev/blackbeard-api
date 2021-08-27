@@ -9,8 +9,10 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
+import java.net.URI;
 import java.util.UUID;
 
 import static java.util.Objects.nonNull;
@@ -20,18 +22,12 @@ import static java.util.Objects.nonNull;
 public class BarberShopService {
 
     private final BarberShopRepository repository;
-    private final ImageService imageService;
+    private final ImageStorageService imageStorageService;
 
     @Transactional
     public BarberShop save(BarberShop barberShop) {
         barberShop.generateId();
-        barberShop.setUrlLogo("https://image.freepik.com/free-vector/gentleman-barber-shop-logo_96485-97.jpg");
-        final var persistedBarberShop = repository.save(barberShop);
-
-        var images = imageService.saveImages(persistedBarberShop);
-        persistedBarberShop.setImages(images);
-
-        return persistedBarberShop;
+        return repository.save(barberShop);
     }
 
     @Transactional
@@ -59,6 +55,21 @@ public class BarberShopService {
         }
 
         barberShop.setAddress(address);
+        repository.save(barberShop);
+    }
+
+    public URI saveLogo(UUID barberShopId, MultipartFile multipartFile) {
+        var barberShop = findById(barberShopId);
+        var uriLogo = imageStorageService.uploadFile(multipartFile, barberShop.getId().toString());
+        barberShop.setUrlLogo(uriLogo.toString());
+        repository.save(barberShop);
+        return uriLogo;
+    }
+
+    public void deleteLogo(UUID barberShopId) {
+        var barberShop = findById(barberShopId);
+        imageStorageService.deleteFile(barberShop.getId());
+        barberShop.setUrlLogo(null);
         repository.save(barberShop);
     }
 }
