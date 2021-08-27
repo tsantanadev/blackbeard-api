@@ -8,7 +8,7 @@ public class BarberShopImageException extends RuntimeException {
         super(msg);
     }
 
-    public static BarberShopImageException imageDoesNotBarberShop(){
+    public static BarberShopImageException imageDoesNotBarberShop() {
         return new BarberShopImageException(LIMIT_OF_IMAGES_EXCEEDED);
     }
 }

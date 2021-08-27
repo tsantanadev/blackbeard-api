@@ -10,15 +10,15 @@ public class FileException extends RuntimeException {
         super(msg);
     }
 
-    public static FileException errorToReadFile(){
+    public static FileException errorToReadFile() {
         return new FileException(ERROR_TO_READ_FILE);
     }
 
-    public static FileException invalidImageFormat(){
+    public static FileException invalidImageFormat() {
         return new FileException(IMAGE_FORMAT_ERROR_MESSAGE);
     }
 
-    public static FileException errorToGetImageURI(){
+    public static FileException errorToGetImageURI() {
         return new FileException(FAIL_TO_CONVERT_URL_TO_URI);
     }
 }
