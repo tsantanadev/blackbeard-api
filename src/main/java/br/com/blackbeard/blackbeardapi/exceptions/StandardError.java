@@ -6,12 +6,12 @@ import lombok.Data;
 public class StandardError<T> {
 
     private Integer status;
-    private T message;
-    private String error;
+    private String message;
+    private T error;
     private long timeStamp;
     private String path;
 
-    public StandardError(Integer status, T message, String error, long timeStamp, String path) {
+    public StandardError(Integer status, String message, T error, long timeStamp, String path) {
         this.status = status;
         this.message = message;
         this.error = error;
