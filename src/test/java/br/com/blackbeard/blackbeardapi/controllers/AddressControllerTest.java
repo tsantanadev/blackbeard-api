@@ -110,7 +110,7 @@ class AddressControllerTest {
                         .content(requestJson))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message", is(errors)))
+                .andExpect(jsonPath("$.error", is(errors)))
                 .andExpect(jsonPath("$.status", is(HttpStatus.BAD_REQUEST.value())));
     }
 
