@@ -35,8 +35,8 @@ public class ResourceExceptionHandler {
 
         return ResponseEntity.badRequest().body(new StandardError<>(
                 HttpStatus.BAD_REQUEST.value(),
-                errors,
                 VALIDATION_ERROR,
+                errors,
                 Calendar.getInstance().getTimeInMillis(),
                 request.getRequestURI()));
     }

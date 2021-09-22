@@ -93,7 +93,7 @@ class BarberControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message", is(errors)))
+                .andExpect(jsonPath("$.error", is(errors)))
                 .andExpect(jsonPath("$.status", is(HttpStatus.BAD_REQUEST.value())));
     }
 
@@ -207,7 +207,7 @@ class BarberControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message", is(errors)))
+                .andExpect(jsonPath("$.error", is(errors)))
                 .andExpect(jsonPath("$.status", is(HttpStatus.BAD_REQUEST.value())));
     }
 }
