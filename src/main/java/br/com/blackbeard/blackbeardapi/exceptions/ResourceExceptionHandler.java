@@ -92,4 +92,16 @@ public class ResourceExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST.value()).body(exception);
     }
 
+    @ExceptionHandler(BarberArgumentException.class)
+    public ResponseEntity<StandardError<String>> barberArgumentExceptionHandler(
+            BarberArgumentException e, HttpServletRequest request) {
+        var exception = new StandardError<>(
+                HttpStatus.BAD_REQUEST.value(),
+                VALIDATION_ERROR,
+                e.getMessage(),
+                System.currentTimeMillis(),
+                request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception);
+    }
+
 }

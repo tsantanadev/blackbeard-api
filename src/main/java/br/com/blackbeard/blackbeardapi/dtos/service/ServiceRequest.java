@@ -15,11 +15,12 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class ServiceRequest {
 
+    public static final int MAX_CHARACTERS = 36;
+
     @NotBlank
     private String name;
 
-    @NotBlank
-    @Length(min = 30, max = 500)
+    @Length(max = MAX_CHARACTERS)
     private String description;
 
     private BigDecimal price;
