@@ -3,6 +3,7 @@ package br.com.blackbeard.blackbeardapi.controllers;
 
 import br.com.blackbeard.blackbeardapi.dtos.barber.BarberRequest;
 import br.com.blackbeard.blackbeardapi.dtos.barber.BarberResponse;
+import br.com.blackbeard.blackbeardapi.exceptions.BarberArgumentException;
 import br.com.blackbeard.blackbeardapi.exceptions.ObjectNotFoundException;
 import br.com.blackbeard.blackbeardapi.models.Barber;
 import br.com.blackbeard.blackbeardapi.models.BarberShop;
@@ -70,10 +71,10 @@ class BarberControllerTest {
         var json = mapper.writeValueAsString(barberRequest);
 
         mockMvc.perform(
-                MockMvcRequestBuilders.post("/barber")
-                        .param("idBarberShop", barberShop.getId().toString())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json))
+                        MockMvcRequestBuilders.post("/barber")
+                                .param("idBarberShop", barberShop.getId().toString())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(json))
                 .andExpect(status().isCreated())
                 .andExpect(content().string(this.mapper.writeValueAsString(barberResponse)));
     }
@@ -89,9 +90,30 @@ class BarberControllerTest {
         var requestJson = mapper.writeValueAsString(barberRequest);
 
         mockMvc.perform(
-                MockMvcRequestBuilders.post("/barber")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestJson))
+                        MockMvcRequestBuilders.post("/barber")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(requestJson))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error", is(errors)))
+                .andExpect(jsonPath("$.status", is(HttpStatus.BAD_REQUEST.value())));
+    }
+
+    @Test
+    void shouldReturnBadRequestAndErrorListWhenPostAnInvalidRequestAttributeName() throws Exception {
+        var barberRequest = BarberRequest.builder()
+                .name("test test test test test test test test")
+                .build();
+
+        var errors = Map.of(
+                "name", "length must be between 1 and 24"
+        );
+
+        var requestJson = mapper.writeValueAsString(barberRequest);
+
+        mockMvc.perform(
+                        MockMvcRequestBuilders.post("/barber")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(requestJson))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error", is(errors)))
                 .andExpect(jsonPath("$.status", is(HttpStatus.BAD_REQUEST.value())));
@@ -112,8 +134,8 @@ class BarberControllerTest {
         var json = mapper.writeValueAsString(response);
 
         mockMvc.perform(
-                MockMvcRequestBuilders.get("/barber/{id}", barber.getId())
-                        .accept(MediaType.APPLICATION_JSON))
+                        MockMvcRequestBuilders.get("/barber/{id}", barber.getId())
+                                .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(content().string(json))
                 .andExpect(status().isOk());
@@ -124,8 +146,8 @@ class BarberControllerTest {
         when(service.findById(any())).thenThrow(ObjectNotFoundException.class);
 
         mockMvc.perform(
-                MockMvcRequestBuilders.get("/barber/{id}", UUID.randomUUID())
-                        .accept(MediaType.APPLICATION_JSON))
+                        MockMvcRequestBuilders.get("/barber/{id}", UUID.randomUUID())
+                                .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isNotFound());
     }
@@ -145,9 +167,9 @@ class BarberControllerTest {
                 .thenReturn(new PageImpl<>(singletonList(barber)));
 
         mockMvc.perform(
-                MockMvcRequestBuilders.get("/barber")
-                        .param("idBarberShop", barberShop.getId().toString())
-                        .accept(MediaType.APPLICATION_JSON))
+                        MockMvcRequestBuilders.get("/barber")
+                                .param("idBarberShop", barberShop.getId().toString())
+                                .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk());
     }
@@ -159,9 +181,9 @@ class BarberControllerTest {
                 .thenThrow(ObjectNotFoundException.class);
 
         mockMvc.perform(
-                MockMvcRequestBuilders.get("/barber")
-                        .param("idBarberShop", id.toString())
-                        .accept(MediaType.APPLICATION_JSON))
+                        MockMvcRequestBuilders.get("/barber")
+                                .param("idBarberShop", id.toString())
+                                .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isNotFound());
     }
@@ -181,10 +203,10 @@ class BarberControllerTest {
         var json = mapper.writeValueAsString(barberRequest);
 
         mockMvc.perform(
-                MockMvcRequestBuilders.put("/barber")
-                        .param("idBarber", id.toString())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json))
+                        MockMvcRequestBuilders.put("/barber")
+                                .param("idBarber", id.toString())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(json))
                 .andExpect(status().isAccepted());
 
         verify(service, times(1)).update(barber, id);
@@ -202,12 +224,44 @@ class BarberControllerTest {
         var requestJson = mapper.writeValueAsString(barberRequest);
 
         mockMvc.perform(
-                MockMvcRequestBuilders.put("/barber")
-                        .param("idBarber", id.toString())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestJson))
+                        MockMvcRequestBuilders.put("/barber")
+                                .param("idBarber", id.toString())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(requestJson))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error", is(errors)))
+                .andExpect(jsonPath("$.status", is(HttpStatus.BAD_REQUEST.value())));
+    }
+
+    @Test
+    void shouldReturnBadRequestAndErrorWhenPostAnInvalidRequestAttributeName() throws Exception {
+        var barberRequest = BarberRequest.builder()
+                .name("test")
+                .build();
+
+        var barber = Barber.builder()
+                .name(barberRequest.getName())
+                .build();
+
+        var barberShop = BarberShop.builder()
+                .id(UUID.randomUUID())
+                .build();
+
+        when(service.save(barber, barberShop.getId())).thenThrow(BarberArgumentException.barberNameIsNotEquals());
+
+        var requestJson = mapper.writeValueAsString(barberRequest);
+
+        var message = "Validation error";
+        var error = "barber name cannot be repeated";
+
+        mockMvc.perform(
+                        MockMvcRequestBuilders.post("/barber")
+                                .param("idBarberShop", barberShop.getId().toString())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(requestJson))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message", is(message)))
+                .andExpect(jsonPath("$.error", is(error)))
                 .andExpect(jsonPath("$.status", is(HttpStatus.BAD_REQUEST.value())));
     }
 }

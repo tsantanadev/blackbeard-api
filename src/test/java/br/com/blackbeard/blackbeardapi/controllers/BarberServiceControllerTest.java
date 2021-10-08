@@ -82,10 +82,56 @@ class BarberServiceControllerTest {
         var json = mapper.writeValueAsString(serviceRequest);
 
         mockMvc.perform(
-                MockMvcRequestBuilders.post("/barber/service")
-                        .param("barberId", barber.getId().toString())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json))
+                        MockMvcRequestBuilders.post("/barber/service")
+                                .param("barberId", barber.getId().toString())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(json))
+                .andExpect(status().isCreated())
+                .andExpect(content().string(this.mapper.writeValueAsString(serviceResponse)));
+    }
+
+    @Test
+    void shouldReturnCreatedWhenPostAValidRequestWithoutDescription() throws Exception {
+        var barber = Barber.builder()
+                .id(UUID.randomUUID())
+                .build();
+
+        var serviceRequest = ServiceRequest.builder()
+                .name("teste")
+                .price(BigDecimal.valueOf(15.5))
+                .duration(BigDecimal.valueOf(30))
+                .build();
+
+        var serviceBarber = BarberServiceModel.builder()
+                .name(serviceRequest.getName())
+                .duration(serviceRequest.getDuration())
+                .price(serviceRequest.getPrice())
+                .build();
+
+        var serviceReturned = BarberServiceModel.builder()
+                .id(UUID.randomUUID())
+                .name(serviceBarber.getName())
+                .price(serviceBarber.getPrice())
+                .duration(serviceBarber.getDuration())
+                .barber(barber)
+                .build();
+
+        var serviceResponse = ServiceResponse.builder()
+                .id(serviceReturned.getId())
+                .name(serviceReturned.getName())
+                .duration(serviceRequest.getDuration())
+                .price(serviceRequest.getPrice())
+                .build();
+
+        when(service.save(serviceBarber, barber.getId())).thenReturn(serviceReturned);
+
+        var json = mapper.writeValueAsString(serviceRequest);
+
+        mockMvc.perform(
+                        MockMvcRequestBuilders.post("/barber/service")
+                                .param("barberId", barber.getId().toString())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(json))
                 .andExpect(status().isCreated())
                 .andExpect(content().string(this.mapper.writeValueAsString(serviceResponse)));
     }
@@ -95,16 +141,45 @@ class BarberServiceControllerTest {
         var serviceRequest = ServiceRequest.builder().build();
 
         var errors = Map.of(
-                "name", "must not be blank",
-                "description", "must not be blank"
+                "name", "must not be blank"
+
         );
 
         var requestJson = mapper.writeValueAsString(serviceRequest);
 
         mockMvc.perform(
-                MockMvcRequestBuilders.post("/barber/service")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestJson))
+                        MockMvcRequestBuilders.post("/barber/service")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(requestJson))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error", is(errors)))
+                .andExpect(jsonPath("$.status", is(HttpStatus.BAD_REQUEST.value())));
+    }
+
+
+    @Test
+    void shouldReturnBadRequestAndErrorListWhenPostAnInvalidRequestAttributeDescription() throws Exception {
+        var barber = Barber.builder()
+                .id(UUID.randomUUID())
+                .build();
+
+        var serviceRequest = ServiceRequest.builder()
+                .name("test")
+                .description("test test test test test test test test test test test test test")
+                .build();
+
+        var errors = Map.of(
+                "description", "length must be between 0 and 36"
+
+        );
+
+        var requestJson = mapper.writeValueAsString(serviceRequest);
+
+        mockMvc.perform(
+                        MockMvcRequestBuilders.post("/barber/service")
+                                .param("barberId", barber.getId().toString())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(requestJson))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error", is(errors)))
                 .andExpect(jsonPath("$.status", is(HttpStatus.BAD_REQUEST.value())));
@@ -125,8 +200,8 @@ class BarberServiceControllerTest {
         var json = mapper.writeValueAsString(response);
 
         mockMvc.perform(
-                MockMvcRequestBuilders.get("/barber/service/{id}", serviceBarber.getId())
-                        .accept(MediaType.APPLICATION_JSON))
+                        MockMvcRequestBuilders.get("/barber/service/{id}", serviceBarber.getId())
+                                .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(content().string(json))
                 .andExpect(status().isOk());
@@ -137,8 +212,8 @@ class BarberServiceControllerTest {
         when(service.findById(any())).thenThrow(ObjectNotFoundException.class);
 
         mockMvc.perform(
-                MockMvcRequestBuilders.get("/barber/service/{id}", UUID.randomUUID())
-                        .accept(MediaType.APPLICATION_JSON))
+                        MockMvcRequestBuilders.get("/barber/service/{id}", UUID.randomUUID())
+                                .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isNotFound());
     }
@@ -158,9 +233,9 @@ class BarberServiceControllerTest {
                 .thenReturn(new PageImpl<>(singletonList(serviceBarber)));
 
         mockMvc.perform(
-                MockMvcRequestBuilders.get("/barber/service")
-                        .param("barberId", barber.getId().toString())
-                        .accept(MediaType.APPLICATION_JSON))
+                        MockMvcRequestBuilders.get("/barber/service")
+                                .param("barberId", barber.getId().toString())
+                                .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk());
     }
@@ -172,9 +247,9 @@ class BarberServiceControllerTest {
                 .thenThrow(ObjectNotFoundException.class);
 
         mockMvc.perform(
-                MockMvcRequestBuilders.get("/barber/service")
-                        .param("barberId", id.toString())
-                        .accept(MediaType.APPLICATION_JSON))
+                        MockMvcRequestBuilders.get("/barber/service")
+                                .param("barberId", id.toString())
+                                .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isNotFound());
     }
@@ -200,10 +275,10 @@ class BarberServiceControllerTest {
         var json = mapper.writeValueAsString(serviceRequest);
 
         mockMvc.perform(
-                MockMvcRequestBuilders.put("/barber/service")
-                        .param("serviceId", id.toString())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json))
+                        MockMvcRequestBuilders.put("/barber/service")
+                                .param("serviceId", id.toString())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(json))
                 .andExpect(status().isAccepted());
 
         verify(service, times(1)).update(serviceBarber, id);
@@ -215,17 +290,17 @@ class BarberServiceControllerTest {
         var serviceRequest = ServiceRequest.builder().build();
 
         var errors = Map.of(
-                "name", "must not be blank",
-                "description", "must not be blank"
+                "name", "must not be blank"
+
         );
 
         var requestJson = mapper.writeValueAsString(serviceRequest);
 
         mockMvc.perform(
-                MockMvcRequestBuilders.put("/barber/service")
-                        .param("serviceId", id.toString())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestJson))
+                        MockMvcRequestBuilders.put("/barber/service")
+                                .param("serviceId", id.toString())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(requestJson))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error", is(errors)))
                 .andExpect(jsonPath("$.status", is(HttpStatus.BAD_REQUEST.value())));
