@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class BlackbeardApiApplication {
 
 	public static void main(String[] args) {
+		System.setProperty("user.timezone", "America/Sao_Paulo");
 		SpringApplication.run(BlackbeardApiApplication.class, args);
 	}
 
