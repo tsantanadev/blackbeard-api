@@ -5,7 +5,7 @@ import br.com.blackbeard.blackbeardapi.models.Address;
 import br.com.blackbeard.blackbeardapi.models.Barber;
 import br.com.blackbeard.blackbeardapi.models.BarberShop;
 import br.com.blackbeard.blackbeardapi.repositories.BarberRepository;
-import br.com.blackbeard.blackbeardapi.service.validation.barber.ValidationBarber;
+import br.com.blackbeard.blackbeardapi.service.validation.barber.BarberValidation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,7 +38,7 @@ class BarberServiceTest {
     private BarberShopService barberShopService;
 
     @Mock
-    private List<ValidationBarber> validationBarber;
+    private List<BarberValidation> barberValidation;
 
     @Captor
     ArgumentCaptor<Barber> barberCaptor;
@@ -145,7 +145,7 @@ class BarberServiceTest {
 
         service.save(barber, barber.getBarberShop().getId());
 
-        validationBarber.forEach(v -> {
+        barberValidation.forEach(v -> {
             verify(v, times(1)).validation(barber);
         });
     }

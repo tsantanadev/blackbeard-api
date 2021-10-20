@@ -8,18 +8,20 @@ import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
-public class BarberNameIsNotEquals implements ValidationBarber {
+public class BarberNameAlreadyExists implements BarberValidation {
 
     private final BarberRepository repository;
 
     @Override
     public void validation(Barber barber) {
-        var listBarber = repository.findAllByBarberShopId(barber.getBarberShop().getId());
-        listBarber.forEach(obj -> {
-            if (obj.getName().equals(barber.getName())) {
-                throw BarberArgumentException.barberNameIsNotEquals();
-            }
-        });
+
+        var barberPersisted = repository.findBarberByBarberShopIdAndName(
+                barber.getBarberShop().getId(),
+                barber.getName());
+
+        if (barberPersisted != null) {
+            throw BarberArgumentException.barberNameAlreadyExists();
+        }
 
     }
 }

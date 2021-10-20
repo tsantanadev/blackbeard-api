@@ -247,12 +247,12 @@ class BarberControllerTest {
                 .id(UUID.randomUUID())
                 .build();
 
-        when(service.save(barber, barberShop.getId())).thenThrow(BarberArgumentException.barberNameIsNotEquals());
+        when(service.save(barber, barberShop.getId())).thenThrow(BarberArgumentException.barberNameAlreadyExists());
 
         var requestJson = mapper.writeValueAsString(barberRequest);
 
         var message = "Validation error";
-        var error = "barber name cannot be repeated";
+        var error = "There is already a barber with that name for this barbershop";
 
         mockMvc.perform(
                         MockMvcRequestBuilders.post("/barber")

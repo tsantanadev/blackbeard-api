@@ -4,14 +4,13 @@ import br.com.blackbeard.blackbeardapi.exceptions.BarberArgumentException;
 import br.com.blackbeard.blackbeardapi.models.Barber;
 import br.com.blackbeard.blackbeardapi.models.BarberShop;
 import br.com.blackbeard.blackbeardapi.repositories.BarberRepository;
-import br.com.blackbeard.blackbeardapi.service.validation.barber.BarberNameIsNotEquals;
+import br.com.blackbeard.blackbeardapi.service.validation.barber.BarberNameAlreadyExists;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -19,10 +18,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class BarberNameIsNotEqualsTest {
+class BarberNameAlreadyExistsTest {
 
     @InjectMocks
-    private BarberNameIsNotEquals barberNameIsNotEquals;
+    private BarberNameAlreadyExists barberNameAlreadyExists;
 
     @Mock
     private BarberRepository repository;
@@ -36,25 +35,15 @@ class BarberNameIsNotEqualsTest {
                         .build())
                 .build();
 
-        var barber2 = Barber.builder()
-                .name("test 2")
-                .barberShop(BarberShop.builder()
-                        .id(UUID.randomUUID())
-                        .build())
-                .build();
-
-        var listBarber = new ArrayList<Barber>();
-        listBarber.add(barber2);
-
-        when(repository.findAllByBarberShopId(
+        when(repository.findBarberByBarberShopIdAndName(
                 barber.getBarberShop()
-                        .getId())).thenReturn(listBarber);
+                        .getId(), barber.getName())).thenReturn(null);
 
-        barberNameIsNotEquals.validation(barber);
+        barberNameAlreadyExists.validation(barber);
 
         verify(repository, times(1))
-                .findAllByBarberShopId(barber.getBarberShop().getId());
-
+                .findBarberByBarberShopIdAndName(barber.getBarberShop().getId(),
+                        barber.getName());
     }
 
     @Test
@@ -66,16 +55,13 @@ class BarberNameIsNotEqualsTest {
                         .build())
                 .build();
 
-        var listBarber = new ArrayList<Barber>();
-        listBarber.add(barber);
-
-        when(repository.findAllByBarberShopId(
+        when(repository.findBarberByBarberShopIdAndName(
                 barber.getBarberShop()
-                        .getId())).thenReturn(listBarber);
+                        .getId(), barber.getName())).thenReturn(barber);
 
         var exception = assertThrows(BarberArgumentException.class,
-                () -> barberNameIsNotEquals.validation(barber));
+                () -> barberNameAlreadyExists.validation(barber));
 
-        assertThat(exception).hasMessage("barber name cannot be repeated");
+        assertThat(exception).hasMessage("There is already a barber with that name for this barbershop");
     }
 }

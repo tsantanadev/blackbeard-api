@@ -2,13 +2,13 @@ package br.com.blackbeard.blackbeardapi.exceptions;
 
 public class BarberArgumentException extends RuntimeException {
 
-    public static final String BARBER_NAME_CANNOT_BE_REPEATED = "barber name cannot be repeated";
+    public static final String BARBER_NAME_CANNOT_BE_REPEATED = "There is already a barber with that name for this barbershop";
 
-    public BarberArgumentException(String message) {
+    private BarberArgumentException(String message) {
         super(message);
     }
 
-    public static BarberArgumentException barberNameIsNotEquals() {
+    public static BarberArgumentException barberNameAlreadyExists() {
         return new BarberArgumentException(BARBER_NAME_CANNOT_BE_REPEATED);
     }
 }
