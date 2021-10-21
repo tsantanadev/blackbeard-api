@@ -118,13 +118,13 @@ class BarberServiceTest {
     void shouldUpdateAnBarberById() {
         var persistedBarber = Barber.builder()
                 .id(UUID.randomUUID())
-                .name("teste")
+                .name("test")
                 .barberShop(barber.getBarberShop())
                 .build();
 
         var barber = Barber.builder()
                 .id(UUID.randomUUID())
-                .name("teste 2")
+                .name("test 2")
                 .build();
 
         var excepted = Barber.builder()
@@ -145,8 +145,8 @@ class BarberServiceTest {
 
         service.save(barber, barber.getBarberShop().getId());
 
-        barberValidation.forEach(v -> {
-            verify(v, times(1)).validation(barber);
+        barberValidation.forEach(validation -> {
+            verify(validation, times(1)).validate(barber);
         });
     }
 }

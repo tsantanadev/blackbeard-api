@@ -4,5 +4,5 @@ import br.com.blackbeard.blackbeardapi.models.Barber;
 
 public interface BarberValidation {
 
-    void validation(Barber barber);
+    void validate(Barber barber);
 }

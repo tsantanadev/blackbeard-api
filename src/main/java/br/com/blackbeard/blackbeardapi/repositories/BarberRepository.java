@@ -13,5 +13,6 @@ public interface BarberRepository extends JpaRepository<Barber, UUID> {
 
     Page<Barber> findAllByBarberShopId(UUID idBarberShop, Pageable pageable);
 
-    Barber findBarberByBarberShopIdAndName(UUID idBarberShop, String nameBarber);
+    Boolean existsBarberByNameAndBarberShopId(String nameBarber, UUID idBarberShop);
+
 }

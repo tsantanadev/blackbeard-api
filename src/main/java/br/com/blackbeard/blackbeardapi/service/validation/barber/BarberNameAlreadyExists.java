@@ -13,13 +13,14 @@ public class BarberNameAlreadyExists implements BarberValidation {
     private final BarberRepository repository;
 
     @Override
-    public void validation(Barber barber) {
+    public void validate(Barber barber) {
 
-        var barberPersisted = repository.findBarberByBarberShopIdAndName(
-                barber.getBarberShop().getId(),
-                barber.getName());
+        var barberPersisted = repository.existsBarberByNameAndBarberShopId(
+                barber.getName(),
+                barber.getBarberShop().getId()
+        );
 
-        if (barberPersisted != null) {
+        if (Boolean.TRUE.equals(barberPersisted)) {
             throw BarberArgumentException.barberNameAlreadyExists();
         }
 

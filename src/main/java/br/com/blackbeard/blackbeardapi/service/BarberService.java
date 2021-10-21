@@ -18,12 +18,12 @@ public class BarberService {
 
     private final BarberRepository repository;
     private final BarberShopService barberShopService;
-    private final List<BarberValidation> barberValidation;
+    private final List<BarberValidation> barberValidationList;
 
     public Barber save(Barber barber, UUID idBarberShop) {
         barber.generateId();
         barber.setBarberShop(barberShopService.findById(idBarberShop));
-        barberValidation.forEach(obj -> obj.validation(barber));
+        callBarberValidation(barber);
         return repository.save(barber);
     }
 
@@ -41,5 +41,9 @@ public class BarberService {
     public Page<Barber> listAllBarberByIdBarberShop(UUID idBarberShop, Pageable pageable) {
         barberShopService.findById(idBarberShop);
         return repository.findAllByBarberShopId(idBarberShop, pageable);
+    }
+
+    private void callBarberValidation(Barber barber) {
+        barberValidationList.forEach(validation -> validation.validate(barber));
     }
 }

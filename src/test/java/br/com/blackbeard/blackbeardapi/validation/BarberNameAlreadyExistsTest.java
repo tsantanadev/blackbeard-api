@@ -35,15 +35,15 @@ class BarberNameAlreadyExistsTest {
                         .build())
                 .build();
 
-        when(repository.findBarberByBarberShopIdAndName(
-                barber.getBarberShop()
-                        .getId(), barber.getName())).thenReturn(null);
+        when(repository.existsBarberByNameAndBarberShopId(
+                barber.getName(),
+                barber.getBarberShop().getId())).thenReturn(false);
 
-        barberNameAlreadyExists.validation(barber);
+        barberNameAlreadyExists.validate(barber);
 
         verify(repository, times(1))
-                .findBarberByBarberShopIdAndName(barber.getBarberShop().getId(),
-                        barber.getName());
+                .existsBarberByNameAndBarberShopId(barber.getName(),
+                        barber.getBarberShop().getId());
     }
 
     @Test
@@ -55,12 +55,12 @@ class BarberNameAlreadyExistsTest {
                         .build())
                 .build();
 
-        when(repository.findBarberByBarberShopIdAndName(
-                barber.getBarberShop()
-                        .getId(), barber.getName())).thenReturn(barber);
+        when(repository.existsBarberByNameAndBarberShopId(
+                barber.getName(),
+                barber.getBarberShop().getId())).thenReturn(true);
 
         var exception = assertThrows(BarberArgumentException.class,
-                () -> barberNameAlreadyExists.validation(barber));
+                () -> barberNameAlreadyExists.validate(barber));
 
         assertThat(exception).hasMessage("There is already a barber with that name for this barbershop");
     }
