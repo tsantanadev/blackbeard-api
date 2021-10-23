@@ -23,7 +23,7 @@ public class BarberService {
     public Barber save(Barber barber, UUID idBarberShop) {
         barber.generateId();
         barber.setBarberShop(barberShopService.findById(idBarberShop));
-        callBarberValidation(barber);
+        executeBarberValidation(barber);
         return repository.save(barber);
     }
 
@@ -43,7 +43,7 @@ public class BarberService {
         return repository.findAllByBarberShopId(idBarberShop, pageable);
     }
 
-    private void callBarberValidation(Barber barber) {
+    private void executeBarberValidation(Barber barber) {
         barberValidationList.forEach(validation -> validation.validate(barber));
     }
 }
