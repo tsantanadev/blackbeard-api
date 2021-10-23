@@ -5,6 +5,7 @@ import br.com.blackbeard.blackbeardapi.models.Address;
 import br.com.blackbeard.blackbeardapi.models.Barber;
 import br.com.blackbeard.blackbeardapi.models.BarberShop;
 import br.com.blackbeard.blackbeardapi.repositories.BarberRepository;
+import br.com.blackbeard.blackbeardapi.service.validation.barber.BarberValidation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -34,6 +36,9 @@ class BarberServiceTest {
 
     @Mock
     private BarberShopService barberShopService;
+
+    @Mock
+    private List<BarberValidation> barberValidation;
 
     @Captor
     ArgumentCaptor<Barber> barberCaptor;
@@ -74,7 +79,6 @@ class BarberServiceTest {
                 .barberShop(barber.getBarberShop())
                 .build();
 
-
         when(barberShopService.findById(barber.getBarberShop().getId())).thenReturn(barber.getBarberShop());
 
         service.save(newBarber, barber.getBarberShop().getId());
@@ -114,13 +118,13 @@ class BarberServiceTest {
     void shouldUpdateAnBarberById() {
         var persistedBarber = Barber.builder()
                 .id(UUID.randomUUID())
-                .name("teste")
+                .name("test")
                 .barberShop(barber.getBarberShop())
                 .build();
 
         var barber = Barber.builder()
                 .id(UUID.randomUUID())
-                .name("teste 2")
+                .name("test 2")
                 .build();
 
         var excepted = Barber.builder()
@@ -134,5 +138,15 @@ class BarberServiceTest {
         service.update(barber, persistedBarber.getId());
 
         verify(repository, times(1)).save(excepted);
+    }
+
+    @Test
+    void shouldCallValidationWhenSaveABarber() {
+
+        service.save(barber, barber.getBarberShop().getId());
+
+        barberValidation.forEach(validation -> {
+            verify(validation, times(1)).validate(barber);
+        });
     }
 }

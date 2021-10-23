@@ -3,11 +3,13 @@ package br.com.blackbeard.blackbeardapi.service;
 import br.com.blackbeard.blackbeardapi.exceptions.ObjectNotFoundException;
 import br.com.blackbeard.blackbeardapi.models.Barber;
 import br.com.blackbeard.blackbeardapi.repositories.BarberRepository;
+import br.com.blackbeard.blackbeardapi.service.validation.barber.BarberValidation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -16,10 +18,12 @@ public class BarberService {
 
     private final BarberRepository repository;
     private final BarberShopService barberShopService;
+    private final List<BarberValidation> barberValidationList;
 
     public Barber save(Barber barber, UUID idBarberShop) {
         barber.generateId();
         barber.setBarberShop(barberShopService.findById(idBarberShop));
+        executeBarberValidation(barber);
         return repository.save(barber);
     }
 
@@ -37,5 +41,9 @@ public class BarberService {
     public Page<Barber> listAllBarberByIdBarberShop(UUID idBarberShop, Pageable pageable) {
         barberShopService.findById(idBarberShop);
         return repository.findAllByBarberShopId(idBarberShop, pageable);
+    }
+
+    private void executeBarberValidation(Barber barber) {
+        barberValidationList.forEach(validation -> validation.validate(barber));
     }
 }
